@@ -17,4 +17,10 @@ public class DoctorMaster {
 
     @Column(name = "doctor_name")
     public String doctorName;
+
+    @Column(name = "doctor_email")
+    public String doctorEmail;
+
+    @Column(name = "doctor_password")
+    public String doctorPassword;
 }

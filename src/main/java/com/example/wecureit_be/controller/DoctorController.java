@@ -1,7 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.DoctorMaster;
-import com.example.wecureit_be.repository.DoctorMasterRepository;
+import com.example.wecureit_be.impl.DoctorMasterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +12,16 @@ import java.util.List;
 public class DoctorController {
 
     @Autowired
-    DoctorMasterRepository doctorMasterRepository;
+    DoctorMasterImpl doctorMasterImpl;
 
-    @PostMapping(value="/add")
-    public DoctorMaster addDoc (@RequestBody DoctorMaster doctorMaster){
-        return doctorMasterRepository.save(doctorMaster);
+    @PostMapping(value="/addOrUpdate")
+    public DoctorMaster addOrUpdate (@RequestBody DoctorMaster doctorMaster){
+        return doctorMasterImpl.addOrUpdate(doctorMaster);
     }
 
     @GetMapping(value="/get")
     public List<DoctorMaster> getAllDoctors() {
-        return doctorMasterRepository.findAll();
+        return doctorMasterImpl.getAllDoctors();
     }
 
 }
