@@ -1,4 +1,4 @@
-package com.example.wecureit_be;
+package com.example.wecureit_be.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
