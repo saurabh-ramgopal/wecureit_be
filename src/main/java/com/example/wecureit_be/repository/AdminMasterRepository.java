@@ -1,12 +1,9 @@
 package com.example.wecureit_be.repository;
 
-import com.example.wecureit_be.entity.DoctorMaster;
+import com.example.wecureit_be.entity.AdminMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface DoctorMasterRepository extends JpaRepository<DoctorMaster, String> {
-
+public interface AdminMasterRepository extends JpaRepository<AdminMaster, String> {
 }
