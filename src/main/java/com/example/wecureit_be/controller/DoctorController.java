@@ -1,5 +1,7 @@
-package com.example.wecureit_be;
+package com.example.wecureit_be.controller;
 
+import com.example.wecureit_be.entity.DoctorMaster;
+import com.example.wecureit_be.repository.DoctorMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
