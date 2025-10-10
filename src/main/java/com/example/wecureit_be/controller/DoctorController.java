@@ -5,10 +5,9 @@ import com.example.wecureit_be.impl.DoctorMasterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
-@RequestMapping("/doctors")
+@RequestMapping("/doctor")
 public class DoctorController {
 
     @Autowired
@@ -19,9 +18,9 @@ public class DoctorController {
         return doctorMasterImpl.addOrUpdate(doctorMaster);
     }
 
-    @GetMapping(value="/get")
-    public List<DoctorMaster> getAllDoctors() {
-        return doctorMasterImpl.getAllDoctors();
+    @GetMapping(value="/getById")
+    public DoctorMaster getById(@RequestParam String doctorId) {
+        return doctorMasterImpl.getById(doctorId);
     }
 
 }

@@ -20,4 +20,8 @@ public class DoctorMasterImpl {
     public DoctorMaster addOrUpdate(DoctorMaster doctorMaster){
         return doctorMasterRepository.save(doctorMaster);
     }
+
+    public DoctorMaster getById(String doctorId) {
+        return doctorMasterRepository.getDoctorById(doctorId);
+    }
 }
