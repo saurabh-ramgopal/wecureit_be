@@ -12,4 +12,6 @@ public interface DoctorMasterRepository extends JpaRepository<DoctorMaster, Stri
     @Query(value = "SELECT * FROM doctor_master WHERE doctor_master_id = :doctorId", nativeQuery = true)
     DoctorMaster getDoctorById(@Param("doctorId") String doctorId);
 
+    @Query(value = "SELECT * FROM doctor_master WHERE doctor_email = :doctorEmail", nativeQuery = true)
+    DoctorMaster getDoctorByEmail(@Param("doctorEmail") String doctorEmail);
 }

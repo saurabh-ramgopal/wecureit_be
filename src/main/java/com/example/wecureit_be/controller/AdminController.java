@@ -1,7 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.DoctorMaster;
-import com.example.wecureit_be.impl.DoctorMasterImpl;
+import com.example.wecureit_be.impl.DoctorControllerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +14,11 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    DoctorMasterImpl doctorMasterImpl;
+    DoctorControllerImpl doctorControllerImpl;
 
     @GetMapping(value="/getAllDoctors")
     public List<DoctorMaster> getAllDoctors() {
-        return doctorMasterImpl.getAllDoctors();
+        return doctorControllerImpl.getAllDoctors();
     }
 
 }
