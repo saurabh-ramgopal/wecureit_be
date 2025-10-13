@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PatientMasterImpl {
+public class PatientControllerImpl {
 
     @Autowired
     PatientMasterRepository patientMasterRepository;
@@ -17,5 +17,9 @@ public class PatientMasterImpl {
 
     public PatientMaster getById(String patientId) {
         return patientMasterRepository.getPatientById(patientId);
+    }
+
+    public PatientMaster getByEmail(String patientEmail) {
+        return patientMasterRepository.getPatientByEmail(patientEmail);
     }
 }

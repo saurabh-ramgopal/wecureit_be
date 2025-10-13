@@ -1,7 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.DoctorMaster;
-import com.example.wecureit_be.impl.DoctorMasterImpl;
+import com.example.wecureit_be.impl.DoctorControllerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.*;
 public class DoctorController {
 
     @Autowired
-    DoctorMasterImpl doctorMasterImpl;
+    DoctorControllerImpl doctorControllerImpl;
 
     @PostMapping(value="/addOrUpdate")
     public DoctorMaster addOrUpdate (@RequestBody DoctorMaster doctorMaster){
-        return doctorMasterImpl.addOrUpdate(doctorMaster);
+        return doctorControllerImpl.addOrUpdate(doctorMaster);
     }
 
     @GetMapping(value="/getById")
     public DoctorMaster getById(@RequestParam String doctorId) {
-        return doctorMasterImpl.getById(doctorId);
+        return doctorControllerImpl.getById(doctorId);
     }
 
 }

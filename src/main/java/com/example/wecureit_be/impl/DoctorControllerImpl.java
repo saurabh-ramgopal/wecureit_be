@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DoctorMasterImpl {
+public class DoctorControllerImpl {
 
     @Autowired
     DoctorMasterRepository doctorMasterRepository;
@@ -23,5 +23,9 @@ public class DoctorMasterImpl {
 
     public DoctorMaster getById(String doctorId) {
         return doctorMasterRepository.getDoctorById(doctorId);
+    }
+
+    public DoctorMaster getByEmail(String doctorEmail) {
+        return doctorMasterRepository.getDoctorByEmail(doctorEmail);
     }
 }
