@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface PatientMasterRepository extends JpaRepository<PatientMaster, String> {
 
     @Query(value = "SELECT * FROM patient_master WHERE patient_master_id = :patientId", nativeQuery = true)
-    PatientMaster getPatientById(@Param("patientId") String patientId);
+    PatientMaster getPatientById(@Param("patientId") Integer patientId);
 }

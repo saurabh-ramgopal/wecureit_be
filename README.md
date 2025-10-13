@@ -94,6 +94,63 @@ Entity field names:
 - DoctorMaster: `doctorMasterId`, `doctorName`, `doctorEmail`, `doctorPassword`
 - PatientMaster: `patientMasterId`, `patientName`
 
+## Program Flow (startup and request lifecycle)
+
+This section explains how the backend starts and how an incoming HTTP request travels through the application to the database and back.
+
+Startup sequence (high level):
+
+- `com.example.wecureit_be.WecureitBeApplication` — Spring Boot application entry point (main). Spring Boot starts the application context, auto-configures beans and embedded Tomcat.
+- `SecurityConfig.java` (and other `@Configuration` classes like `WebConfig.java`) — configuration classes are processed, security and web configuration beans are registered.
+- Spring scans and registers controllers (`@RestController`), services/impl classes (`@Service`), repositories (`@Repository`) and entities (`@Entity`).
+
+Request lifecycle (example overview):
+
+1. HTTP client calls an endpoint, e.g.:
+
+  GET http://localhost:8080/doctor/getById?doctorId=1001
+
+2. DispatcherServlet receives the request and routes it to the correct controller based on the request path and HTTP method.
+
+3. Controller method parameter binding: Spring MVC extracts the query parameter `doctorId` and converts it to the controller method parameter annotated with `@RequestParam`.
+  - In this project: `DoctorController#getById(@RequestParam Integer doctorId)`.
+
+4. Controller forwards the call to the implementation/service layer:
+  - `DoctorController` calls `DoctorMasterImpl.getById(doctorId)`.
+
+5. Implementation layer calls the repository method which executes the SQL/JPA query:
+  - `DoctorMasterRepository.getDoctorById(@Param("doctorId") Integer doctorId)` is invoked.
+  - The repository method is annotated with `@Query(value = "SELECT * FROM doctor_master WHERE doctor_master_id = :doctorId", nativeQuery = true)` so Spring Data JPA binds the method parameter `doctorId` to the named SQL parameter `:doctorId` and executes the parameterized query against the database.
+
+6. Database returns a row (or none). Spring Data JPA maps the result to the `DoctorMaster` entity (`@Entity`) and returns it to the caller.
+
+7. The controller returns the `DoctorMaster` object. Spring Boot uses Jackson to serialize the entity to JSON and writes the HTTP response back to the client.
+
+Files involved (mapping to the codebase):
+
+- `src/main/java/com/example/wecureit_be/WecureitBeApplication.java` — application entry point
+- `src/main/java/com/example/wecureit_be/config/SecurityConfig.java` — security configuration
+- `src/main/java/com/example/wecureit_be/config/WebConfig.java` — web config (CORS, formatters, etc.)
+- `src/main/java/com/example/wecureit_be/controller/DoctorController.java` — controller that handles `/doctor` endpoints
+- `src/main/java/com/example/wecureit_be/impl/DoctorMasterImpl.java` — service/impl layer that orchestrates repository calls
+- `src/main/java/com/example/wecureit_be/entity/DoctorMaster.java` — JPA entity mapping to the `doctor_master` table
+- `src/main/java/com/example/wecureit_be/repository/DoctorMasterRepository.java` — Spring Data JPA repository with the `@Query` method
+
+Concrete example mapped to code (GET /doctor/getById?doctorId=1001):
+
+- HTTP request URL: `/doctor/getById?doctorId=1001`
+- Controller: `DoctorController.getById` receives Integer `doctorId = 1001` via `@RequestParam`.
+- Impl: `DoctorMasterImpl.getById(1001)` calls the repository.
+- Repository: `getDoctorById(1001)` binds `:doctorId = 1001` into the SQL and executes it.
+- DB row maps to `DoctorMaster` entity and is returned to the client as JSON.
+
+Notes and gotchas:
+
+- `@RequestParam` is required by default. If the caller omits `doctorId`, Spring will return 400 Bad Request unless you set `required = false` or provide `defaultValue`.
+- Parameter binding is done safely using JDBC prepared statements under the hood; values are not concatenated into SQL strings.
+- If your entity's `@Id` type is `Integer`, make sure repository generics match (e.g., `JpaRepository<DoctorMaster, Integer>`).
+- Consider returning `Optional<DoctorMaster>` from repository methods if you want to express "not found" explicitly rather than returning `null`.
+
 ## Smoke tests (curl examples)
 
 Run these once the app is started and listening on `localhost:8080`.
@@ -153,3 +210,5 @@ If you'd like, I can add a `application-local.properties` and a `spring.profiles
 
 ---
 Generated instructions for macOS (zsh). If you want the README adjusted for Windows or Linux, say so.
+
+

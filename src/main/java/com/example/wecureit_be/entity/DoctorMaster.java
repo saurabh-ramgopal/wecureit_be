@@ -13,7 +13,7 @@ public class DoctorMaster {
 
     @Id
     @Column(name = "doctor_master_id")
-    public String doctorMasterId;
+    public Integer doctorMasterId;
 
     @Column(name = "doctor_name")
     public String doctorName;

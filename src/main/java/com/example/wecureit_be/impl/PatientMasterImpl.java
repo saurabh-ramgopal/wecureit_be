@@ -15,7 +15,7 @@ public class PatientMasterImpl {
         return patientMasterRepository.save(patientMaster);
     }
 
-    public PatientMaster getById(String patientId) {
+    public PatientMaster getById(Integer patientId) {
         return patientMasterRepository.getPatientById(patientId);
     }
 }
