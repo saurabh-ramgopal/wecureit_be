@@ -7,10 +7,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PatientMasterRepository extends JpaRepository<PatientMaster, String> {
+public interface PatientMasterRepository extends JpaRepository<PatientMaster, Integer> {
 
     @Query(value = "SELECT * FROM patient_master WHERE patient_master_id = :patientId", nativeQuery = true)
-    PatientMaster getPatientById(@Param("patientId") String patientId);
+    PatientMaster getPatientById(@Param("patientId") Integer patientId);
 
     @Query(value = "SELECT * FROM patient_master WHERE patient_email = :patientEmail", nativeQuery = true)
     PatientMaster getPatientByEmail(@Param("patientEmail") String patientEmail);

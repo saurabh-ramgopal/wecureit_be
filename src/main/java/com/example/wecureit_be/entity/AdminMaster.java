@@ -13,7 +13,7 @@ public class AdminMaster {
 
     @Id
     @Column(name = "admin_master_id")
-    public String adminMasterId;
+    public Integer adminMasterId;
 
     @Column(name = "admin_name")
     public String adminName;

@@ -19,7 +19,7 @@ public class DoctorController {
     }
 
     @GetMapping(value="/getById")
-    public DoctorMaster getById(@RequestParam String doctorId) {
+    public DoctorMaster getById(@RequestParam Integer doctorId) {
         return doctorControllerImpl.getById(doctorId);
     }
 

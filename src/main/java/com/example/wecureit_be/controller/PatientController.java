@@ -2,6 +2,7 @@ package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
+import com.example.wecureit_be.request.PatientRegistrationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,13 @@ public class PatientController {
     }
 
     @GetMapping(value="/getById")
-    public PatientMaster getById (@RequestParam String patientId){
+    public PatientMaster getById (@RequestParam Integer patientId){
         return patientControllerImpl.getById(patientId);
+    }
+
+    @PostMapping(value="/registration")
+    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
+        return patientControllerImpl.newRegistration(patientRegistrationRequest);
     }
 
 }
