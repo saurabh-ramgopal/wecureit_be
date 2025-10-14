@@ -21,7 +21,7 @@ public class DoctorControllerImpl {
         return doctorMasterRepository.save(doctorMaster);
     }
 
-    public DoctorMaster getById(String doctorId) {
+    public DoctorMaster getById(Integer doctorId) {
         return doctorMasterRepository.getDoctorById(doctorId);
     }
 
