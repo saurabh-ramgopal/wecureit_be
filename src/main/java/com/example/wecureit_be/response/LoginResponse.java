@@ -8,4 +8,5 @@ public class LoginResponse {
     String type;
     String result;
     String reason;
+    String token;
 }
