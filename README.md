@@ -183,6 +183,36 @@ curl -i -X POST http://localhost:8080/patient/addOrUpdate \
 curl -i "http://localhost:8080/patient/getById?patientId=pat1"
 ```
 
+## JWT secret and login/register examples
+
+Set `JWT_SECRET` 
+
+```bash
+# generate a 32-byte base64 secret:
+export JWT_SECRET=$(openssl rand -base64 32)
+
+# start the app using that secret
+JWT_SECRET="$JWT_SECRET" ./mvnw spring-boot:run
+```
+
+Quick registration and login (curl):
+
+```bash
+# register
+curl -i -X POST http://localhost:8080/patient/registration \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test+jwt@example.com","password":"Password123!","dob":"1990-01-01"}'
+
+# login
+curl -i -X POST http://localhost:8080/common/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test+jwt@example.com","password":"Password123!","type":"patient"}'
+
+# use token (replace <TOKEN> with the returned token)
+curl -i -X GET http://localhost:8080/patient/57952 \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
 ## Troubleshooting
 
 - Permission denied running `./mvnw`: run `chmod +x ./mvnw`.

@@ -4,6 +4,8 @@ import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,8 +26,13 @@ public class PatientController {
     }
 
     @PostMapping(value="/registration")
-    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
-        return patientControllerImpl.newRegistration(patientRegistrationRequest);
+    public ResponseEntity<?> newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
+        // if email already exists, return 409 Conflict
+        if (patientControllerImpl.emailExists(patientRegistrationRequest.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
+        }
+        PatientMaster saved = patientControllerImpl.newRegistration(patientRegistrationRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
 }
