@@ -1,59 +1,34 @@
 package com.example.wecureit_be.impl;
 
-import com.example.wecureit_be.entity.DoctorMaster;
-import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.request.LoginRequest;
 import com.example.wecureit_be.response.LoginResponse;
+import com.example.wecureit_be.utilities.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Service
 public class CommonControllerImpl {
 
     @Autowired
-    DoctorControllerImpl doctorControllerImpl;
+    AuthenticationManager authenticationManager;
 
     @Autowired
-    PatientControllerImpl patientControllerImpl;
+    JwtUtil jwtUtil;
 
     public LoginResponse checkLoginCredentials(LoginRequest loginRequest) {
-
         log.info("checking credentials for email:{} and type :{}", loginRequest.getEmail(), loginRequest.getType());
-        PatientMaster patientMaster = new PatientMaster();
-        DoctorMaster doctorMaster = new DoctorMaster();
-        String password;
-        String email;
 
-        if(loginRequest.getType().equals("patient")){
-            patientMaster = patientControllerImpl.getByEmail(loginRequest.getEmail());
-        }
-        else {
-            doctorMaster = doctorControllerImpl.getByEmail(loginRequest.getEmail());
-        }
-
-        //if db fetch is empty, user does not exist
-        if(ObjectUtils.isEmpty(patientMaster) || ObjectUtils.isEmpty(doctorMaster)){
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL", "USER_NOT_FOUND");
-        }
-        else if (!ObjectUtils.isEmpty(patientMaster.getPatientMasterId())) {
-            password = patientMaster.getPatientPassword();
-            email = patientMaster.getPatientEmail();
-        }
-        else {
-            password = doctorMaster.getDoctorPassword();
-            email = doctorMaster.getDoctorEmail();
-        }
-
-        //if hashed password matches or not
-        if(loginRequest.getEmail().equals(email)
-                && loginRequest.getPassword().equals(password)){
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "PASS", "LOGIN_SUCCESSFUL");
-        }
-        else{
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL","PASSWORD_INCORRECT");
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            String token = jwtUtil.generateToken(loginRequest.getEmail());
+            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "PASS", "LOGIN_SUCCESSFUL", token);
+        } catch (BadCredentialsException ex) {
+            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL", "PASSWORD_INCORRECT", null);
         }
     }
 }
