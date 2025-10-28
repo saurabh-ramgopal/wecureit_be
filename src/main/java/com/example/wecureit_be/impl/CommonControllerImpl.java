@@ -36,7 +36,7 @@ public class CommonControllerImpl {
 
         //if db fetch is empty, user does not exist
         if(ObjectUtils.isEmpty(patientMaster) || ObjectUtils.isEmpty(doctorMaster)){
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL", "USER_NOT_FOUND");
+            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL", "The user does not exist in system. Please sign up.");
         }
         else if (!ObjectUtils.isEmpty(patientMaster.getPatientMasterId())) {
             password = patientMaster.getPatientPassword();
@@ -53,7 +53,7 @@ public class CommonControllerImpl {
             return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "PASS", "LOGIN_SUCCESSFUL");
         }
         else{
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL","PASSWORD_INCORRECT");
+            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL","Password incorrect, please check credentials.");
         }
     }
 }
