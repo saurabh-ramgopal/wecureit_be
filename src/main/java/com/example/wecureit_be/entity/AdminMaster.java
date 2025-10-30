@@ -15,7 +15,10 @@ public class AdminMaster {
     @Column(name = "admin_master_id")
     public Integer adminMasterId;
 
-    @Column(name = "admin_name")
-    public String adminName;
+    @Column(name = "admin_email")
+    public String adminEmail;
+
+    @Column(name = "admin_password")
+    public String adminPassword;
 
 }
