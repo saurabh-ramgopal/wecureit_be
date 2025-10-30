@@ -18,10 +18,4 @@ public class AdminMaster {
     @Column(name = "admin_name")
     public String adminName;
 
-    @Column(name = "admin_email")
-    public String email;
-
-    @Column(name = "admin_password")
-    public String password;
-
 }
