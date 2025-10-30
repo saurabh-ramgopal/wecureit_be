@@ -2,7 +2,7 @@ package com.example.wecureit_be.impl;
 
 import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.entity.PatientMaster;
-import com.example.wecureit_be.request.LoginRequest;
+import com.example.wecureit_be.request.CommonLoginRequest;
 import com.example.wecureit_be.response.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +19,24 @@ public class CommonControllerImpl {
     @Autowired
     PatientControllerImpl patientControllerImpl;
 
-    public LoginResponse checkLoginCredentials(LoginRequest loginRequest) {
+    public LoginResponse checkLoginCredentials(CommonLoginRequest commonLoginRequest) {
 
-        log.info("checking credentials for email:{} and type :{}", loginRequest.getEmail(), loginRequest.getType());
+        log.info("checking credentials for email:{} and type :{}", commonLoginRequest.getEmail(), commonLoginRequest.getType());
         PatientMaster patientMaster = new PatientMaster();
         DoctorMaster doctorMaster = new DoctorMaster();
         String password;
         String email;
 
-        if(loginRequest.getType().equals("patient")){
-            patientMaster = patientControllerImpl.getByEmail(loginRequest.getEmail());
+        if(commonLoginRequest.getType().equals("patient")){
+            patientMaster = patientControllerImpl.getByEmail(commonLoginRequest.getEmail());
         }
         else {
-            doctorMaster = doctorControllerImpl.getByEmail(loginRequest.getEmail());
+            doctorMaster = doctorControllerImpl.getByEmail(commonLoginRequest.getEmail());
         }
 
         //if db fetch is empty, user does not exist
         if(ObjectUtils.isEmpty(patientMaster) || ObjectUtils.isEmpty(doctorMaster)){
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL", "The user does not exist in system. Please sign up.");
+            return new LoginResponse(commonLoginRequest.getEmail(), commonLoginRequest.getType(), "FAIL", "The user does not exist in system. Please sign up.");
         }
         else if (!ObjectUtils.isEmpty(patientMaster.getPatientMasterId())) {
             password = patientMaster.getPatientPassword();
@@ -48,12 +48,12 @@ public class CommonControllerImpl {
         }
 
         //if hashed password matches or not
-        if(loginRequest.getEmail().equals(email)
-                && loginRequest.getPassword().equals(password)){
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "PASS", "LOGIN_SUCCESSFUL");
+        if(commonLoginRequest.getEmail().equals(email)
+                && commonLoginRequest.getPassword().equals(password)){
+            return new LoginResponse(commonLoginRequest.getEmail(), commonLoginRequest.getType(), "PASS", "LOGIN_SUCCESSFUL");
         }
         else{
-            return new LoginResponse(loginRequest.getEmail(), loginRequest.getType(), "FAIL","Password incorrect, please check credentials.");
+            return new LoginResponse(commonLoginRequest.getEmail(), commonLoginRequest.getType(), "FAIL","Password incorrect, please check credentials.");
         }
     }
 }

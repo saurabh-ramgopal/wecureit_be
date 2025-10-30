@@ -21,6 +21,12 @@ public class DoctorMaster {
     @Column(name = "doctor_email")
     public String doctorEmail;
 
+    @Column(name = "doctor_gender")
+    public String doctorGender;
+
     @Column(name = "doctor_password")
     public String doctorPassword;
+
+    @Column(name = "is_active")
+    public Boolean isActive;
 }
