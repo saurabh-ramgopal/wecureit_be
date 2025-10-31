@@ -3,9 +3,7 @@ package com.example.wecureit_be.impl;
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.repository.PatientMasterRepository;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
-import com.example.wecureit_be.utilities.FirebaseService;
 import com.example.wecureit_be.utilities.Utils;
-import com.google.firebase.auth.FirebaseAuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +14,6 @@ public class PatientControllerImpl {
 
     @Autowired
     PatientMasterRepository patientMasterRepository;
-    
-    @Autowired
-    FirebaseService firebaseService;
 
     public PatientMaster addOrUpdate(PatientMaster patientMaster) {
         return patientMasterRepository.save(patientMaster);

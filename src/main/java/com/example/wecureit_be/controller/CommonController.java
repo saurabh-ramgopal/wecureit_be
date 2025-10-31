@@ -10,6 +10,7 @@ import com.example.wecureit_be.impl.CommonControllerImpl;
 import com.example.wecureit_be.request.DeleteFacilityRequest;
 import com.example.wecureit_be.response.FacilityDetails;
 import com.example.wecureit_be.response.LoginResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,12 @@ public class CommonController {
     FacilityControllerImpl facilityControllerImpl;
 
     @PostMapping(value="/login")
-    public LoginResponse checkLoginCredentials (@RequestBody CommonLoginRequest commonLoginRequest){
-        return commonControllerImpl.checkLoginCredentials(commonLoginRequest);
+    public LoginResponse checkLoginCredentials(
+            @RequestBody CommonLoginRequest commonLoginRequest,
+            HttpServletRequest request) {
+        // Get Firebase UID if present (for Firebase-authenticated users)
+        String firebaseUid = (String) request.getAttribute("firebaseUid");
+        return commonControllerImpl.checkLoginCredentials(commonLoginRequest, firebaseUid);
     }
 
     @GetMapping(value = "/getSpeciality")
