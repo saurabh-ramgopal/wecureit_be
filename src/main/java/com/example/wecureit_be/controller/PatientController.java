@@ -3,6 +3,7 @@ package com.example.wecureit_be.controller;
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,11 @@ public class PatientController {
     }
 
     @PostMapping(value="/registration")
-    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
-        return patientControllerImpl.newRegistration(patientRegistrationRequest);
+    public PatientMaster newRegistration(
+            @RequestBody PatientRegistrationRequest patientRegistrationRequest,
+            HttpServletRequest request) {
+        String firebaseUid = (String) request.getAttribute("firebaseUid");
+        return patientControllerImpl.newRegistration(patientRegistrationRequest, firebaseUid);
     }
 
 }
