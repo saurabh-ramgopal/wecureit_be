@@ -27,15 +27,27 @@ public class PatientControllerImpl {
         return patientMasterRepository.getPatientByEmail(patientEmail);
     }
 
-    public PatientMaster newRegistration(PatientRegistrationRequest patientRegistrationRequest) {
-        log.info("adding new patient details:{}", patientRegistrationRequest.getName());
+    public PatientMaster newRegistration(PatientRegistrationRequest patientRegistrationRequest, String firebaseUid) {
+        log.info("adding new patient details:{} with Firebase UID: {}", patientRegistrationRequest.getName(), firebaseUid);
+        
+        // Check if user already exists in database
+        PatientMaster existingPatient = patientMasterRepository.getPatientByEmail(patientRegistrationRequest.getEmail());
+        if (existingPatient != null) {
+            throw new RuntimeException("Patient with this email already exists in database");
+        }
+        
+        // Create patient record in database
+        // Firebase user is already created by the frontend
         PatientMaster patientMaster = new PatientMaster();
-        patientMaster.setPatientMasterId(Utils.generateFiveDigitNumber()); //to-do change accordingly when auto-increment implemented
-//        patientMaster.setPatientMasterId(Utils.generateUUID()); to be added if we are using String as PK
+        patientMaster.setPatientMasterId(Utils.generateFiveDigitNumber());
         patientMaster.setPatientName(patientRegistrationRequest.getName());
         patientMaster.setPatientEmail(patientRegistrationRequest.getEmail());
-        patientMaster.setPatientPassword(patientRegistrationRequest.getPassword());
+        // Store Firebase UID instead of password
+        patientMaster.setPatientPassword(firebaseUid); // We'll use this field to store Firebase UID
         patientMaster.setPatientDob(patientRegistrationRequest.getDob());
+        
+        log.info("Saved patient to database with Firebase UID: {}", firebaseUid);
+        
         return patientMasterRepository.save(patientMaster);
     }
 

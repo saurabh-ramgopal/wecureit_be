@@ -10,13 +10,16 @@ import com.example.wecureit_be.request.AddDoctorRequest;
 import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorSpecialityRequest;
 import com.example.wecureit_be.response.DoctorDetails;
+import com.example.wecureit_be.utilities.FirebaseService;
 import com.example.wecureit_be.utilities.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DoctorControllerImpl {
 
@@ -29,6 +32,9 @@ public class DoctorControllerImpl {
     @Autowired
     DoctorSpecialityMappingRepository doctorSpecialityMappingRepository;
 
+    @Autowired
+    FirebaseService firebaseService;
+
     public List<DoctorDetails> getAllDoctors(){
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
         List<DoctorDetails> listOfDoctorDetails = new ArrayList<>();
@@ -40,19 +46,36 @@ public class DoctorControllerImpl {
     }
 
     public DoctorDetails addDoctor(AddDoctorRequest addDoctorRequest){
-        DoctorMaster doctorMaster = new DoctorMaster();
-        doctorMaster.setDoctorMasterId(Utils.generateFiveDigitNumber());
-        doctorMaster.setDoctorName(addDoctorRequest.getDoctorName());
-        doctorMaster.setDoctorGender(addDoctorRequest.getDoctorGender());
-        doctorMaster.setDoctorPassword(addDoctorRequest.getDoctorPassword());
-        doctorMaster.setDoctorEmail(addDoctorRequest.getDoctorEmail());
-        doctorMaster.setIsActive(true);
-        doctorMasterRepository.save(doctorMaster);
+        try {
+            // Create Firebase account for the doctor
+            String firebaseUid = firebaseService.createFirebaseUser(
+                addDoctorRequest.getDoctorEmail(), 
+                addDoctorRequest.getDoctorPassword(),
+                "doctor"
+            );
+            
+            log.info("Created Firebase account for doctor: email={}, uid={}", 
+                addDoctorRequest.getDoctorEmail(), firebaseUid);
+            
+            // Save doctor to database with Firebase UID
+            DoctorMaster doctorMaster = new DoctorMaster();
+            doctorMaster.setDoctorMasterId(Utils.generateFiveDigitNumber());
+            doctorMaster.setDoctorName(addDoctorRequest.getDoctorName());
+            doctorMaster.setDoctorGender(addDoctorRequest.getDoctorGender());
+            doctorMaster.setDoctorPassword(firebaseUid); // Store Firebase UID instead of password
+            doctorMaster.setDoctorEmail(addDoctorRequest.getDoctorEmail());
+            doctorMaster.setIsActive(true);
+            doctorMasterRepository.save(doctorMaster);
 
-        DoctorSpecialityRequest doctorSpecialityRequest = new DoctorSpecialityRequest();
-        doctorSpecialityRequest.setDoctorMasterId(doctorMaster.getDoctorMasterId());
-        doctorSpecialityRequest.setSpecialityList(addDoctorRequest.getSpecialityList());
-        return updateDoctorSpeciality(doctorSpecialityRequest);
+            DoctorSpecialityRequest doctorSpecialityRequest = new DoctorSpecialityRequest();
+            doctorSpecialityRequest.setDoctorMasterId(doctorMaster.getDoctorMasterId());
+            doctorSpecialityRequest.setSpecialityList(addDoctorRequest.getSpecialityList());
+            return updateDoctorSpeciality(doctorSpecialityRequest);
+            
+        } catch (Exception e) {
+            log.error("Error creating doctor with Firebase: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create doctor: " + e.getMessage());
+        }
     }
 
     public DoctorMaster deleteDoctor(DeleteDoctorRequest deleteDoctorRequest){

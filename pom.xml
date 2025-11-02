@@ -59,14 +59,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-	</dependencies>
-
-	<build>
+	<dependency>
+		<groupId>org.projectlombok</groupId>
+		<artifactId>lombok</artifactId>
+		<optional>true</optional>
+	</dependency>
+	<!-- Firebase Admin SDK for JWT verification -->
+	<dependency>
+		<groupId>com.google.firebase</groupId>
+		<artifactId>firebase-admin</artifactId>
+		<version>9.2.0</version>
+	</dependency>
+</dependencies>	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
