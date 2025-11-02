@@ -28,15 +28,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // stateless session
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - no authentication required
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/common/login").permitAll() // Legacy login endpoint (optional, can be removed)
-                        .requestMatchers("/api/patient/register").permitAll() // Registration endpoint - must come BEFORE /api/patient/**
+                        .requestMatchers("/common/login").permitAll() // Common login endpoint
+                        .requestMatchers("/admin/login").permitAll() // Admin login endpoint  
+                        .requestMatchers("/patient/registration").permitAll() // Patient registration
+                        .requestMatchers("/common/getSpeciality").permitAll() // Public specialty data
+                        .requestMatchers("/common/getFacility").permitAll() // Public facility data
+                        .requestMatchers("/admin/getAllDoctors").permitAll() // Public doctor list
                         .requestMatchers("/actuator/**").permitAll()
-                        
-                        // Protected endpoints - require Firebase authentication
-                        .requestMatchers("/api/patient/**").hasRole("PATIENT")
-                        .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         
                         // All other requests require authentication
                         .anyRequest().authenticated()

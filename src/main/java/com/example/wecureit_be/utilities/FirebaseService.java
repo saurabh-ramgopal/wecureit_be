@@ -75,6 +75,14 @@ public class FirebaseService {
     }
     
     /**
+     * Get Firebase UID by email
+     */
+    public String getFirebaseUidByEmail(String email) throws FirebaseAuthException {
+        UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
+        return userRecord.getUid();
+    }
+    
+    /**
      * Verify if Firebase user exists
      */
     public boolean userExists(String email) {

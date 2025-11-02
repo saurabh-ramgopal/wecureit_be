@@ -20,13 +20,13 @@ public class AdminControllerImpl {
         AdminMaster adminMaster = getByEmail(adminLoginRequest.getEmail());
 
         if(ObjectUtils.isEmpty(adminMaster))
-            return new LoginResponse(adminLoginRequest.getEmail(), null, "FAIL", "This admin does not exist in system.");
+            return new LoginResponse(adminLoginRequest.getEmail(), null, "FAIL", "This admin does not exist in system.", null);
 
         if(Objects.equals(adminMaster.getAdminPassword(), adminLoginRequest.getPassword())) {
-            return new LoginResponse(adminLoginRequest.getEmail(), null, "PASS", "LOGIN_SUCCESSFUL");
+            return new LoginResponse(adminLoginRequest.getEmail(), null, "PASS", "LOGIN_SUCCESSFUL", "Admin");
         }
         else{
-            return new LoginResponse(adminLoginRequest.getEmail(), null, "FAIL","Password incorrect, please check credentials.");
+            return new LoginResponse(adminLoginRequest.getEmail(), null, "FAIL","Password incorrect, please check credentials.", null);
         }
     }
 
