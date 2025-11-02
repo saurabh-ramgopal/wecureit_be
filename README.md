@@ -194,3 +194,101 @@ curl -i "http://localhost:8080/patient/getById?patientId=pat1"
 ## Run from an IDE
 
 Import the project as a Maven project (IntelliJ IDEA or Eclipse). Set the project SDK to Java 21. Run the main class `com.example.wecureit_be.WecureitBeApplication`.
+
+How to backup the database and run locally:
+Here’s the **exact README section** you can add — it documents how to connect Amazon RDS to pgAdmin, create local backups, and configure your Spring Boot app for both environments.
+
+---
+
+## Database Setup and Backup — WeCureIT
+
+### 1. Connect to Amazon RDS from pgAdmin
+
+1. **Open pgAdmin 4**
+
+   * Launch pgAdmin and expand the left sidebar (“Servers”).
+
+2. **Add a New Server**
+
+   * Right-click **Servers → Create → Server**
+   * Under the **General tab**, name it: `WeCureIT-RDS`.
+
+3. **Configure Connection Tab**
+
+   | Field                | Example Value                                       |
+   | -------------------- | --------------------------------------------------- |
+   | Host name / address  | `wecureit.ca18uqsmuuzk.us-east-1.rds.amazonaws.com` |
+   | Port                 | `5432`                                              |
+   | Maintenance database | `wecureit`                                          |
+   | Username             | `wecureit_db`                                       |
+   | Password             | `wecureit_db`                                       |
+   | SSL Mode             | `Require`                                           |
+
+   Click **Save**.
+   pgAdmin will now connect to your AWS RDS PostgreSQL instance.
+
+---
+
+### 2. Create a Local Backup from RDS
+
+1. **Right-click on Database → Backup**
+
+   * Choose the **RDS database** (`wecureit`).
+   * Select **Backup...**.
+
+2. **In the Backup dialog:**
+
+   * **Format:** Custom (`.dump`)
+   * **Filename:**
+     `/Users/<your-username>/rds_backups/wecureit_$(date).dump`
+   * **Encoding:** UTF-8
+   * Leave other settings default.
+
+3. Click **Backup**.
+
+   Your backup file (`.dump`) will be created locally (in the chosen folder).
+
+---
+
+### 3. Restore the Backup to Local PostgreSQL
+
+1. **Connect to Local Server in pgAdmin**
+
+   * Right-click **Servers → Create → Server**
+   * Use:
+
+     * Host: `localhost`
+     * Port: `5432`
+     * Username: your macOS PostgreSQL username (e.g., `ullasbc`)
+     * Password: (same as local)
+
+2. **Create Empty Database**
+
+   * Right-click **Databases → Create → Database**
+   * Name: `wecureit`
+
+3. **Restore**
+
+   * Right-click **wecureit → Restore...**
+   * Select the `.dump` file you backed up earlier.
+   * Format: **Custom**
+   * Check *“Clean before restore”* (optional).
+   * Click **Restore**.
+
+If successful, you’ll see all `doctor_master`, `facility_master`, etc. tables under **Schemas → public → Tables**.
+
+---
+
+
+## Spring Boot Configuration
+
+### `application.properties`
+
+```properties
+spring.application.name=wecureit_be
+spring.profiles.active=local  # or prod
+```
+
+
+
+
