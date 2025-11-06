@@ -46,6 +46,7 @@ public class AdminController {
 
     @PostMapping(value="/updateDoctorSpeciality")
     public DoctorDetails updateDoctorSpeciality (@RequestBody DoctorSpecialityRequest doctorSpecialityRequest){
-        return doctorControllerImpl.updateDoctorSpeciality(doctorSpecialityRequest);
+        return doctorControllerImpl.updateDoctorStateSpecialities(doctorSpecialityRequest.getDoctorMasterId(),
+                doctorSpecialityRequest.getDoctorStateSpeciality());
     }
 }

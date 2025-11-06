@@ -39,7 +39,7 @@ public class CommonController {
     }
 
     @GetMapping(value = "/getFacility")
-    public List<FacilityMaster> getFacility(){
+    public List<FacilityDetails> getFacility(){
         return facilityControllerImpl.getAllFacility();
     }
 

@@ -11,7 +11,8 @@ public class FacilityDetails {
     public String facilityName;
     public Integer noOfRooms;
     public String facilityStreet;
-    public String facilityCity;
+    public String stateCode;
+    public String stateName;
     public Boolean isActive;
     public List<SpecialityMaster> speciality;
 }

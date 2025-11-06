@@ -10,5 +10,5 @@ public class AddDoctorRequest {
     String doctorGender;
     String doctorEmail;
     String doctorPassword;
-    List<String> specialityList;
+    List<DoctorStateSpeciality> doctorStateSpeciality;
 }
