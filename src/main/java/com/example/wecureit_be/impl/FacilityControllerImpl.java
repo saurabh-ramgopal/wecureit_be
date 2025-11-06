@@ -4,6 +4,7 @@ import com.example.wecureit_be.entity.*;
 import com.example.wecureit_be.repository.FacilityMasterRepository;
 import com.example.wecureit_be.repository.FacilitySpecialityMappingRepository;
 import com.example.wecureit_be.repository.SpecialityMasterRepository;
+import com.example.wecureit_be.repository.StateMasterRepository;
 import com.example.wecureit_be.request.AddOrUpdateFacilityRequest;
 import com.example.wecureit_be.request.DeleteFacilityRequest;
 import com.example.wecureit_be.response.FacilityDetails;
@@ -29,9 +30,27 @@ public class FacilityControllerImpl {
     @Autowired
     FacilitySpecialityMappingRepository facilitySpecialityMappingRepository;
 
+    @Autowired
+    StateMasterRepository stateMasterRepository;
 
-    public List<FacilityMaster> getAllFacility(){
-        return facilityMasterRepository.getAllFacility();
+
+    public List<FacilityDetails> getAllFacility(){
+
+        List<FacilityDetails> response = new ArrayList<>();
+        List<FacilityMaster> listOfFacilityMaster = facilityMasterRepository.getAllFacility();
+
+        for(FacilityMaster eachFacility : listOfFacilityMaster){
+            FacilityDetails facilityDetail = new FacilityDetails();
+
+            List<SpecialityMaster> specialityMaster = getSpecialityByFacilityId(eachFacility.getFacilityMasterId());
+
+            BeanUtils.copyProperties(eachFacility, facilityDetail);
+            facilityDetail.setSpeciality(specialityMaster);
+            facilityDetail.setStateCode(eachFacility.getStateCode().getStateCode());
+            facilityDetail.setStateName(eachFacility.getStateCode().getStateName());
+            response.add(facilityDetail);
+        }
+        return response;
     }
 
 
@@ -46,9 +65,11 @@ public class FacilityControllerImpl {
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
         }
 
+        StateMaster stateMaster = stateMasterRepository.getStateById(addOrUpdateFacilityRequest.getStateCode());
+
         facilityMaster.setFacilityName(addOrUpdateFacilityRequest.getFacilityName());
         facilityMaster.setFacilityStreet(addOrUpdateFacilityRequest.getFacilityStreet());
-        facilityMaster.setFacilityCity(addOrUpdateFacilityRequest.getFacilityCity());
+        facilityMaster.setStateCode(stateMaster);
         facilityMaster.setNoOfRooms(addOrUpdateFacilityRequest.getNoOfRooms());
         facilityMaster.setIsActive(true);
         facilityMasterRepository.save(facilityMaster);
@@ -69,6 +90,8 @@ public class FacilityControllerImpl {
 
         BeanUtils.copyProperties(facilityMaster, facilityDetails);
         facilityDetails.setSpeciality(specialityMaster);
+        facilityDetails.setStateCode(facilityMaster.getStateCode().getStateCode());
+        facilityDetails.setStateName(facilityMaster.getStateCode().getStateName());
 
         return facilityDetails;
     }

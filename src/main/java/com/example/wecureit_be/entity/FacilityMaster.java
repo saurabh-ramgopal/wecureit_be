@@ -1,9 +1,6 @@
 package com.example.wecureit_be.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -24,8 +21,9 @@ public class FacilityMaster {
     @Column(name = "facility_street")
     public String facilityStreet;
 
-    @Column(name = "facility_city")
-    public String facilityCity;
+    @ManyToOne
+    @JoinColumn(name = "state_code")
+    public StateMaster stateCode;
 
     @Column(name = "is_active")
     public Boolean isActive;

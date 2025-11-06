@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class DoctorSpecialityRequest {
     Integer doctorMasterId;
-    List<String> specialityList;
+    List<DoctorStateSpeciality> doctorStateSpeciality;
 }
