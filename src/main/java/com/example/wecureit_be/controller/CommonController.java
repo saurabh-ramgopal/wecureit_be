@@ -38,8 +38,8 @@ public class CommonController {
         return specialityControllerImpl.getAllSpeciality();
     }
 
-    @GetMapping(value = "/getFacility")
-    public List<FacilityDetails> getFacility(){
+    @GetMapping(value = "/facility/getAll")
+    public List<FacilityDetails> getAllFacility(){
         return facilityControllerImpl.getAllFacility();
     }
 
@@ -48,7 +48,7 @@ public class CommonController {
         return facilityControllerImpl.addOrUpdateFacility(addOrUpdateFacilityRequest);
     }
 
-    @PostMapping(value = "/deleteFacility")
+    @PostMapping(value = "/facility/delete")
     public FacilityMaster deleteFacility(@RequestBody DeleteFacilityRequest deleteFacilityRequest){
         return facilityControllerImpl.deleteFacility(deleteFacilityRequest);
     }
