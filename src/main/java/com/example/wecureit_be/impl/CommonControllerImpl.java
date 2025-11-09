@@ -1,13 +1,15 @@
 package com.example.wecureit_be.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
 import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.request.CommonLoginRequest;
 import com.example.wecureit_be.response.LoginResponse;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Service

@@ -1,9 +1,10 @@
 package com.example.wecureit_be.response;
 
-import com.example.wecureit_be.entity.SpecialityMaster;
-import lombok.Data;
-
 import java.util.List;
+
+import com.example.wecureit_be.entity.SpecialityMaster;
+
+import lombok.Data;
 
 @Data
 public class FacilityDetails {

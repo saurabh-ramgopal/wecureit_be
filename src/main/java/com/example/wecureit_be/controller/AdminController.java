@@ -1,7 +1,16 @@
 package com.example.wecureit_be.controller;
 
-import com.example.wecureit_be.entity.DoctorMaster;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.impl.AdminControllerImpl;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
 import com.example.wecureit_be.request.AddDoctorRequest;
@@ -10,10 +19,6 @@ import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorSpecialityRequest;
 import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.response.LoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")

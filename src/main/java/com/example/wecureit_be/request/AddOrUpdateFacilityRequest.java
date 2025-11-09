@@ -1,8 +1,8 @@
 package com.example.wecureit_be.request;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class AddOrUpdateFacilityRequest {

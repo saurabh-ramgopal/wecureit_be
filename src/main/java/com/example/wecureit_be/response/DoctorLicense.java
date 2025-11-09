@@ -1,7 +1,8 @@
 package com.example.wecureit_be.response;
 
-import lombok.Value;
 import java.util.List;
+
+import lombok.Value;
 
 @Value
 public class DoctorLicense {

@@ -1,7 +1,8 @@
 package com.example.wecureit_be.response;
 
-import lombok.Data;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class RoomDetail {
