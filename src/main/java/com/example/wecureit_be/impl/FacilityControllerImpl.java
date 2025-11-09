@@ -18,7 +18,6 @@ import com.example.wecureit_be.repository.FacilitySpecialityMappingRepository;
 import com.example.wecureit_be.repository.SpecialityMasterRepository;
 import com.example.wecureit_be.repository.StateMasterRepository;
 import com.example.wecureit_be.request.AddOrUpdateFacilityRequest;
-import com.example.wecureit_be.response.RoomDetail;
 import com.example.wecureit_be.request.DeleteFacilityRequest;
 import com.example.wecureit_be.response.FacilityDetails;
 import com.example.wecureit_be.response.RoomDetail;
