@@ -1,6 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.DoctorMaster;
+import org.springframework.http.ResponseEntity;
 import com.example.wecureit_be.impl.AdminControllerImpl;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
 import com.example.wecureit_be.request.AddDoctorRequest;
@@ -35,13 +36,29 @@ public class AdminController {
     }
 
     @PostMapping(value="/addDoctor")
-    public DoctorDetails addDoctor (@RequestBody AddDoctorRequest addDoctorRequest){
-        return doctorControllerImpl.addDoctor(addDoctorRequest);
+    public org.springframework.http.ResponseEntity<?> addDoctor (@RequestBody AddDoctorRequest addDoctorRequest){
+        try {
+            DoctorDetails dd = doctorControllerImpl.addDoctor(addDoctorRequest);
+            return org.springframework.http.ResponseEntity.ok(dd);
+        } catch (IllegalArgumentException iae) {
+            java.util.Map<String, String> error = new java.util.HashMap<>();
+            error.put("message", iae.getMessage());
+            return org.springframework.http.ResponseEntity.badRequest().body(error);
+        } catch (Exception ex) {
+            java.util.Map<String, String> error = new java.util.HashMap<>();
+            error.put("message", "Internal error while adding doctor");
+            return org.springframework.http.ResponseEntity.status(500).body(error);
+        }
     }
 
     @PostMapping(value="/deleteDoctor")
-    public DoctorMaster deleteDoctor (@RequestBody DeleteDoctorRequest deleteDoctorRequest){
-        return doctorControllerImpl.deleteDoctor(deleteDoctorRequest);
+    public ResponseEntity<?> deleteDoctor (@RequestBody DeleteDoctorRequest deleteDoctorRequest){
+        DoctorMaster result = doctorControllerImpl.deleteDoctor(deleteDoctorRequest);
+        if (result == null) {
+            // return empty JSON object so frontend can safely parse response.json()
+            return ResponseEntity.ok().body(new java.util.HashMap<>());
+        }
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping(value="/updateDoctorSpeciality")

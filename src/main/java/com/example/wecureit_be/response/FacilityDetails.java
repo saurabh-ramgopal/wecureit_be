@@ -15,4 +15,6 @@ public class FacilityDetails {
     public String stateName;
     public Boolean isActive;
     public List<SpecialityMaster> speciality;
+    // Optional per-room details (populated when available or on add/update)
+    public List<com.example.wecureit_be.response.RoomDetail> roomDetails;
 }

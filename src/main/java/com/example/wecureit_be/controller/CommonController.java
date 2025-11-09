@@ -4,6 +4,8 @@ import com.example.wecureit_be.entity.FacilityMaster;
 import com.example.wecureit_be.entity.SpecialityMaster;
 import com.example.wecureit_be.impl.FacilityControllerImpl;
 import com.example.wecureit_be.impl.SpecialityControllerImpl;
+import com.example.wecureit_be.entity.StateMaster;
+import com.example.wecureit_be.repository.StateMasterRepository;
 import com.example.wecureit_be.request.AddOrUpdateFacilityRequest;
 import com.example.wecureit_be.request.CommonLoginRequest;
 import com.example.wecureit_be.impl.CommonControllerImpl;
@@ -28,6 +30,9 @@ public class CommonController {
     @Autowired
     FacilityControllerImpl facilityControllerImpl;
 
+    @Autowired
+    StateMasterRepository stateMasterRepository;
+
     @PostMapping(value="/login")
     public LoginResponse checkLoginCredentials (@RequestBody CommonLoginRequest commonLoginRequest){
         return commonControllerImpl.checkLoginCredentials(commonLoginRequest);
@@ -51,6 +56,11 @@ public class CommonController {
     @PostMapping(value = "/facility/delete")
     public FacilityMaster deleteFacility(@RequestBody DeleteFacilityRequest deleteFacilityRequest){
         return facilityControllerImpl.deleteFacility(deleteFacilityRequest);
+    }
+
+    @GetMapping(value = "/getState")
+    public java.util.List<StateMaster> getState(){
+        return stateMasterRepository.findAll();
     }
 
 }

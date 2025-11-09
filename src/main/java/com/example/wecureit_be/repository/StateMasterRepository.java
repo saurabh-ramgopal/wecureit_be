@@ -12,4 +12,7 @@ public interface StateMasterRepository extends JpaRepository<StateMaster, String
     @Query(value = "SELECT * FROM state_master where state_code = :stateCode ", nativeQuery = true)
     StateMaster getStateById(@Param("stateCode") String stateCode);
 
+    @Query(value = "SELECT * FROM state_master where lower(state_name) = lower(:stateName) LIMIT 1", nativeQuery = true)
+    StateMaster getStateByName(@Param("stateName") String stateName);
+
 }
