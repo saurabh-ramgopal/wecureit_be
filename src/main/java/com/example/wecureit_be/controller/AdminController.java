@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.wecureit_be.entity.DoctorMaster;
+import org.springframework.http.ResponseEntity;
 import com.example.wecureit_be.impl.AdminControllerImpl;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
 import com.example.wecureit_be.request.AddDoctorRequest;

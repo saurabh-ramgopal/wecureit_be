@@ -148,9 +148,16 @@ public class DoctorControllerImpl {
     doctorSpecialityMappingRepository.deleteDoctorAllSpeciality(doctorId);
 
         for(DoctorStateSpeciality eachStateSpeciality : listOfDoctorStateSpecialities){
+
+            StateMaster stateMaster = stateMasterRepository.getStateById(eachStateSpeciality.getStateCode());
+
             for(String eachSpeciality : eachStateSpeciality.getSpecialityList()){
-                doctorSpecialityMappingRepository.insertIntoDoctorSpecialityMapping
-                        (doctorId, eachSpeciality, eachStateSpeciality.getStateCode());
+                SpecialityMaster specialityMaster = specialityMasterRepository.getSpecialityById(eachSpeciality);
+                DoctorSpecialityMapping doctorSpecialityMapping = new DoctorSpecialityMapping();
+                doctorSpecialityMapping.setDoctorMaster(doctorMaster);
+                doctorSpecialityMapping.setSpecialityMaster(specialityMaster);
+                doctorSpecialityMapping.setStateMaster(stateMaster);
+                doctorSpecialityMappingRepository.save(doctorSpecialityMapping);
             }
         }
 
