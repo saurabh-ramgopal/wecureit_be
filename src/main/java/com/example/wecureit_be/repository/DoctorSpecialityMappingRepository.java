@@ -23,4 +23,12 @@ public interface DoctorSpecialityMappingRepository extends JpaRepository<DoctorS
     @Query(value = "DELETE FROM doctor_speciality_mapping WHERE doctor_master_id = :doctorMasterId ", nativeQuery = true)
     int deleteDoctorAllSpeciality(@Param("doctorMasterId") Integer doctorMasterId);
 
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO public.doctor_speciality_mapping (doctor_master_id, speciality_master_id, state_code) " +
+            "VALUES( :doctorMasterId , :specialityMasterId , :stateCode );", nativeQuery = true)
+    void insertIntoDoctorSpecialityMapping(@Param("doctorMasterId") Integer doctorMasterId,
+                                             @Param("specialityMasterId") String specialityMasterId,
+                                             @Param("stateCode") String stateCode);
+
 }
