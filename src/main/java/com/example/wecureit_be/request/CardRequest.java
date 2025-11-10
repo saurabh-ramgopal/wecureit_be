@@ -9,4 +9,5 @@ public class CardRequest {
     private String brand;
     private int expMonth;
     private int expYear;
+    private Integer patientMasterId;
 }

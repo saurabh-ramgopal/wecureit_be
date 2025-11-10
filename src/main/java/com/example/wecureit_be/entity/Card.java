@@ -25,4 +25,8 @@ public class Card {
     private String brand;
     private int expMonth;
     private int expYear;
+
+    @ManyToOne
+    @JoinColumn(name = "patient_master_id", referencedColumnName = "patient_master_id")
+    private PatientMaster patientMaster;
 }
