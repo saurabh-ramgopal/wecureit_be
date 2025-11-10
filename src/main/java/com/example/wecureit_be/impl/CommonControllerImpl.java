@@ -19,6 +19,9 @@ public class CommonControllerImpl {
     @Autowired
     PatientControllerImpl patientControllerImpl;
 
+    @Autowired
+    AdminControllerImpl adminControllerImpl;
+
     public LoginResponse checkLoginCredentials(CommonLoginRequest commonLoginRequest) {
 
         log.info("checking credentials for email:{} and type :{}", commonLoginRequest.getEmail(), commonLoginRequest.getType());
@@ -26,6 +29,14 @@ public class CommonControllerImpl {
         DoctorMaster doctorMaster = new DoctorMaster();
         String password;
         String email;
+
+        // Delegate admin login to AdminControllerImpl
+        if (commonLoginRequest != null && "admin".equalsIgnoreCase(commonLoginRequest.getType())) {
+            com.example.wecureit_be.request.AdminLoginRequest adminReq = new com.example.wecureit_be.request.AdminLoginRequest();
+            adminReq.setEmail(commonLoginRequest.getEmail());
+            adminReq.setPassword(commonLoginRequest.getPassword());
+            return adminControllerImpl.checkLoginCredentials(adminReq);
+        }
 
         if(commonLoginRequest.getType().equals("patient")){
             patientMaster = patientControllerImpl.getByEmail(commonLoginRequest.getEmail());

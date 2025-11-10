@@ -1,19 +1,26 @@
 package com.example.wecureit_be.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.wecureit_be.entity.FacilityMaster;
 import com.example.wecureit_be.entity.SpecialityMaster;
+import com.example.wecureit_be.entity.StateMaster;
+import com.example.wecureit_be.impl.CommonControllerImpl;
 import com.example.wecureit_be.impl.FacilityControllerImpl;
 import com.example.wecureit_be.impl.SpecialityControllerImpl;
+import com.example.wecureit_be.repository.StateMasterRepository;
 import com.example.wecureit_be.request.AddOrUpdateFacilityRequest;
 import com.example.wecureit_be.request.CommonLoginRequest;
-import com.example.wecureit_be.impl.CommonControllerImpl;
 import com.example.wecureit_be.request.DeleteFacilityRequest;
 import com.example.wecureit_be.response.FacilityDetails;
 import com.example.wecureit_be.response.LoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/common")
@@ -27,6 +34,9 @@ public class CommonController {
 
     @Autowired
     FacilityControllerImpl facilityControllerImpl;
+
+    @Autowired
+    StateMasterRepository stateMasterRepository;
 
     @PostMapping(value="/login")
     public LoginResponse checkLoginCredentials (@RequestBody CommonLoginRequest commonLoginRequest){
@@ -51,6 +61,11 @@ public class CommonController {
     @PostMapping(value = "/facility/delete")
     public FacilityMaster deleteFacility(@RequestBody DeleteFacilityRequest deleteFacilityRequest){
         return facilityControllerImpl.deleteFacility(deleteFacilityRequest);
+    }
+
+    @GetMapping(value = "/getState")
+    public java.util.List<StateMaster> getState(){
+        return stateMasterRepository.findAll();
     }
 
 }

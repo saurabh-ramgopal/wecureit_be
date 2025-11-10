@@ -1,15 +1,19 @@
 package com.example.wecureit_be.repository;
 
-import com.example.wecureit_be.entity.StateMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.example.wecureit_be.entity.StateMaster;
 
 @Repository
 public interface StateMasterRepository extends JpaRepository<StateMaster, String> {
 
     @Query(value = "SELECT * FROM state_master where state_code = :stateCode ", nativeQuery = true)
     StateMaster getStateById(@Param("stateCode") String stateCode);
+
+    @Query(value = "SELECT * FROM state_master where lower(state_name) = lower(:stateName) LIMIT 1", nativeQuery = true)
+    StateMaster getStateByName(@Param("stateName") String stateName);
 
 }

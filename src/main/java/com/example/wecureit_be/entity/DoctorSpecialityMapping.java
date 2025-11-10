@@ -21,6 +21,7 @@ public class DoctorSpecialityMapping implements Serializable {
     @JoinColumn(name = "speciality_master_id", referencedColumnName = "speciality_master_id")
     private SpecialityMaster specialityMaster;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "state_code")
     private StateMaster stateMaster;
