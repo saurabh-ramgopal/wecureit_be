@@ -42,18 +42,8 @@ public class AdminController {
 
     @PostMapping(value="/addDoctor")
     public org.springframework.http.ResponseEntity<?> addDoctor (@RequestBody AddDoctorRequest addDoctorRequest){
-        try {
-            DoctorDetails dd = doctorControllerImpl.addDoctor(addDoctorRequest);
-            return org.springframework.http.ResponseEntity.ok(dd);
-        } catch (IllegalArgumentException iae) {
-            java.util.Map<String, String> error = new java.util.HashMap<>();
-            error.put("message", iae.getMessage());
-            return org.springframework.http.ResponseEntity.badRequest().body(error);
-        } catch (Exception ex) {
-            java.util.Map<String, String> error = new java.util.HashMap<>();
-            error.put("message", "Internal error while adding doctor");
-            return org.springframework.http.ResponseEntity.status(500).body(error);
-        }
+        DoctorDetails dd = doctorControllerImpl.addDoctor(addDoctorRequest);
+        return org.springframework.http.ResponseEntity.ok(dd);
     }
 
     @PostMapping(value="/deleteDoctor")
