@@ -19,6 +19,11 @@ import com.example.wecureit_be.repository.StateMasterRepository;
 import com.example.wecureit_be.request.AddDoctorRequest;
 import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorStateSpeciality;
+import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
+import com.example.wecureit_be.request.AddDoctorAvailabilityList;
+import com.example.wecureit_be.response.AddDoctorAvailabilityResponse;
+import com.example.wecureit_be.repository.DoctorFacilityAvailabilityRepository;
+import com.example.wecureit_be.entity.DoctorFacilityAvailability;
 import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.utilities.Utils;
 
@@ -33,6 +38,9 @@ public class DoctorControllerImpl {
 
     @Autowired
     DoctorSpecialityMappingRepository doctorSpecialityMappingRepository;
+
+    @Autowired
+    DoctorFacilityAvailabilityRepository doctorFacilityAvailabilityRepository;
 
     @Autowired
     StateMasterRepository stateMasterRepository;
@@ -248,7 +256,18 @@ public class DoctorControllerImpl {
         return doctorMasterRepository.getDoctorByEmail(doctorEmail);
     }
 
-    public DoctorDetails addAvailability(Integer doctorId) {
-        return null;
+    public AddDoctorAvailabilityResponse addAvailability(AddDoctorAvailabilityRequest request) {
+
+        for(AddDoctorAvailabilityList eachFacility : request.getFacilityList()){
+            DoctorFacilityAvailability doctorFacilityAvailability = new DoctorFacilityAvailability();
+            doctorFacilityAvailability.setDfAvailabilityId(Utils.generateUUID());
+            doctorFacilityAvailability.setDoctorMasterId(request.getDoctorId());
+            doctorFacilityAvailability.setFacilityMasterId(eachFacility.getFacilityId());
+            doctorFacilityAvailability.setAvailableDate(eachFacility.getAvailableDate());
+            doctorFacilityAvailability.setAvailableStartTime(eachFacility.getAvailableStartTime());
+            doctorFacilityAvailability.setAvailableEndTime(eachFacility.getAvailableEndTime());
+            doctorFacilityAvailabilityRepository.save(doctorFacilityAvailability);
+        }
+        return new AddDoctorAvailabilityResponse(request.getDoctorId(), request.getFacilityList());
     }
 }
