@@ -23,6 +23,18 @@ public class CardService {
     }
 
     public Card addCard(CardRequest req) throws Exception {
+        // fetch PatientMaster and set the relation
+        PatientMaster pm = patientController.getById(req.getPatientMasterId());
+
+        // Check for duplicate PAN for this patient by decrypting existing cards
+        var existingCards = repo.findAllByPatientMasterPatientMasterIdOrderByIdAsc(req.getPatientMasterId());
+        for (Card existing : existingCards) {
+            String existingPan = encryptService.decryptCard(existing.getEncryptedPan(), existing.getWrappedDek(), existing.getIv());
+            if (existingPan != null && existingPan.equals(req.getPan())) {
+                throw new Exception("Card with same PAN already exists for this patient");
+            }
+        }
+
         var encrypted = encryptService.encryptCard(req.getPan());
         Card card = new Card();
         card.setEncryptedPan(encrypted.encryptedPan());
@@ -32,8 +44,6 @@ public class CardService {
         card.setBrand(req.getBrand());
         card.setExpMonth(req.getExpMonth());
         card.setExpYear(req.getExpYear());
-        // fetch PatientMaster and set the relation
-        PatientMaster pm = patientController.getById(req.getPatientMasterId());
         card.setPatientMaster(pm);
         return repo.save(card);
     }

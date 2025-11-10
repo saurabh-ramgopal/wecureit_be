@@ -12,4 +12,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("SELECT c.last4 FROM Card c WHERE c.patientMaster.patientMasterId = :patientMasterId ORDER BY c.id ASC")
     List<String> findByPatientMasterPatientMasterIdOrderByIdAsc(Integer patientMasterId);
 
+    // Fetch full Card entities for a given patient (used for duplicate checks)
+    List<Card> findAllByPatientMasterPatientMasterIdOrderByIdAsc(Integer patientMasterId);
+
 }
