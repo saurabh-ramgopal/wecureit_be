@@ -1,15 +1,5 @@
 package com.example.wecureit_be.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.impl.AdminControllerImpl;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
@@ -19,6 +9,10 @@ import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorSpecialityRequest;
 import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.response.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -41,19 +35,13 @@ public class AdminController {
     }
 
     @PostMapping(value="/addDoctor")
-    public org.springframework.http.ResponseEntity<?> addDoctor (@RequestBody AddDoctorRequest addDoctorRequest){
-        DoctorDetails dd = doctorControllerImpl.addDoctor(addDoctorRequest);
-        return org.springframework.http.ResponseEntity.ok(dd);
+    public DoctorDetails addDoctor (@RequestBody AddDoctorRequest addDoctorRequest){
+        return doctorControllerImpl.addDoctor(addDoctorRequest);
     }
 
     @PostMapping(value="/deleteDoctor")
-    public ResponseEntity<?> deleteDoctor (@RequestBody DeleteDoctorRequest deleteDoctorRequest){
-        DoctorMaster result = doctorControllerImpl.deleteDoctor(deleteDoctorRequest);
-        if (result == null) {
-            // return empty JSON object so frontend can safely parse response.json()
-            return ResponseEntity.ok().body(new java.util.HashMap<>());
-        }
-        return ResponseEntity.ok(result);
+    public DoctorMaster deleteDoctor (@RequestBody DeleteDoctorRequest deleteDoctorRequest){
+        return doctorControllerImpl.deleteDoctor(deleteDoctorRequest);
     }
 
     @PostMapping(value="/updateDoctorSpeciality")
