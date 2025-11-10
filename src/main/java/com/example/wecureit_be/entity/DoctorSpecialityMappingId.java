@@ -12,4 +12,5 @@ import java.io.Serializable;
 public class DoctorSpecialityMappingId implements Serializable {
     private Integer doctorMaster;
     private String specialityMaster;
+    private String stateMaster;
 }
