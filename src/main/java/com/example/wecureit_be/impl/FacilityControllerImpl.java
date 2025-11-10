@@ -71,14 +71,24 @@ public class FacilityControllerImpl {
 
         FacilityMaster facilityMaster;
         if(ObjectUtils.isEmpty(addOrUpdateFacilityRequest.getFacilityMasterId())) {
+            StateMaster stateMaster = stateMasterRepository.getStateById(addOrUpdateFacilityRequest.getStateCode());
+
             facilityMaster = new FacilityMaster();
             facilityMaster.setFacilityMasterId(Utils.generateUUID());
+            facilityMaster.setFacilityName(addOrUpdateFacilityRequest.getFacilityName());
+            facilityMaster.setFacilityStreet(addOrUpdateFacilityRequest.getFacilityStreet());
+            facilityMaster.setStateCode(stateMaster);
+            facilityMaster.setNoOfRooms(addOrUpdateFacilityRequest.getNoOfRooms());
+            facilityMaster.setIsActive(true);
+            facilityMasterRepository.save(facilityMaster);
         }
         else{
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
         }
 
-        // Defensive handling: treat empty or blank stateCode as null
+        // Defensive handling: treat empty or blank stateCode as null and prefer
+        // server-side resolution of stateCode/stateName. This preserves
+        // backward-compatibility with older frontend payloads.
         String incomingStateCode = addOrUpdateFacilityRequest.getStateCode();
         log.info("addOrUpdateFacility called for facilityId={} incomingStateCode='{}'", addOrUpdateFacilityRequest.getFacilityMasterId(), incomingStateCode);
         StateMaster stateMaster = null;
@@ -128,14 +138,12 @@ public class FacilityControllerImpl {
         facilityMaster.setIsActive(true);
         facilityMasterRepository.save(facilityMaster);
 
+        // delete existing mappings and re-insert using a native insert helper so
+        // state_code (when present) is written explicitly.
     facilitySpecialityMappingRepository.deleteFacilityAllSpeciality(facilityMaster.getFacilityMasterId());
 
         for(String eachSpeciality : addOrUpdateFacilityRequest.getSpecialityList() ){
-            SpecialityMaster specialityMaster = specialityMasterRepository.getSpecialityById(eachSpeciality);
-            FacilitySpecialityMapping facilitySpecialityMapping = new FacilitySpecialityMapping();
-            facilitySpecialityMapping.setFacilityMaster(facilityMaster);
-            facilitySpecialityMapping.setSpecialityMaster(specialityMaster);
-            facilitySpecialityMappingRepository.save(facilitySpecialityMapping);
+            facilitySpecialityMappingRepository.insertIntoFacilitySpecialityMapping(facilityMaster.getFacilityMasterId(), eachSpeciality);
         }
 
         List<SpecialityMaster> specialityMaster = getSpecialityByFacilityId(facilityMaster.getFacilityMasterId());

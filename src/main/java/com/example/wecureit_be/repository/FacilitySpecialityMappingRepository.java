@@ -24,4 +24,11 @@ public interface FacilitySpecialityMappingRepository extends JpaRepository<Facil
             "where facility_master_id = :facilityMasterId ", nativeQuery = true)
     List<FacilitySpecialityMapping> getSpecialityByFacilityId(@Param("facilityMasterId") String facilityMasterId);
 
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO public.facility_speciality_mapping (facility_master_id, speciality_master_id) " +
+            "VALUES( :facilityMasterId , :specialityMasterId );", nativeQuery = true)
+    void insertIntoFacilitySpecialityMapping(@Param("facilityMasterId") String facilityMasterId,
+                                             @Param("specialityMasterId") String specialityMasterId);
+
 }
