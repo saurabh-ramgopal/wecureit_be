@@ -10,4 +10,6 @@ public class PatientRegistrationRequest {
     String email;
     String password;
     LocalDate dob;
+    String gender;
+    String phone;
 }

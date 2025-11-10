@@ -36,6 +36,8 @@ public class PatientControllerImpl {
         patientMaster.setPatientEmail(patientRegistrationRequest.getEmail());
         patientMaster.setPatientPassword(patientRegistrationRequest.getPassword());
         patientMaster.setPatientDob(patientRegistrationRequest.getDob());
+        patientMaster.setPatientGender(patientRegistrationRequest.getGender());
+        patientMaster.setPatientPhone(patientRegistrationRequest.getPhone());
         return patientMasterRepository.save(patientMaster);
     }
 

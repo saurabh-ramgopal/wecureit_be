@@ -27,4 +27,10 @@ public class PatientMaster {
 
     @Column(name = "patient_dob")
     public LocalDate patientDob;
+
+    @Column(name = "patient_gender")
+    public String patientGender;
+
+    @Column(name = "patient_phone")
+    public String patientPhone;
 }
