@@ -44,6 +44,8 @@ public class CardService {
         card.setBrand(req.getBrand());
         card.setExpMonth(req.getExpMonth());
         card.setExpYear(req.getExpYear());
+        // fetch PatientMaster and set the relation
+        // PatientMaster pm = patientController.getById(req.getPatientMasterId());
         card.setPatientMaster(pm);
         return repo.save(card);
     }
