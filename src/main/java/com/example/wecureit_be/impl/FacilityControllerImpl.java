@@ -58,30 +58,25 @@ public class FacilityControllerImpl {
 
         FacilityMaster facilityMaster;
         if(ObjectUtils.isEmpty(addOrUpdateFacilityRequest.getFacilityMasterId())) {
+            StateMaster stateMaster = stateMasterRepository.getStateById(addOrUpdateFacilityRequest.getStateCode());
+
             facilityMaster = new FacilityMaster();
             facilityMaster.setFacilityMasterId(Utils.generateUUID());
+            facilityMaster.setFacilityName(addOrUpdateFacilityRequest.getFacilityName());
+            facilityMaster.setFacilityStreet(addOrUpdateFacilityRequest.getFacilityStreet());
+            facilityMaster.setStateCode(stateMaster);
+            facilityMaster.setNoOfRooms(addOrUpdateFacilityRequest.getNoOfRooms());
+            facilityMaster.setIsActive(true);
+            facilityMasterRepository.save(facilityMaster);
         }
         else{
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
         }
 
-        StateMaster stateMaster = stateMasterRepository.getStateById(addOrUpdateFacilityRequest.getStateCode());
-
-        facilityMaster.setFacilityName(addOrUpdateFacilityRequest.getFacilityName());
-        facilityMaster.setFacilityStreet(addOrUpdateFacilityRequest.getFacilityStreet());
-        facilityMaster.setStateCode(stateMaster);
-        facilityMaster.setNoOfRooms(addOrUpdateFacilityRequest.getNoOfRooms());
-        facilityMaster.setIsActive(true);
-        facilityMasterRepository.save(facilityMaster);
-
         int rows = facilitySpecialityMappingRepository.deleteFacilityAllSpeciality(facilityMaster.getFacilityMasterId());
 
         for(String eachSpeciality : addOrUpdateFacilityRequest.getSpecialityList() ){
-            SpecialityMaster specialityMaster = specialityMasterRepository.getSpecialityById(eachSpeciality);
-            FacilitySpecialityMapping facilitySpecialityMapping = new FacilitySpecialityMapping();
-            facilitySpecialityMapping.setFacilityMaster(facilityMaster);
-            facilitySpecialityMapping.setSpecialityMaster(specialityMaster);
-            facilitySpecialityMappingRepository.save(facilitySpecialityMapping);
+            facilitySpecialityMappingRepository.insertIntoFacilitySpecialityMapping(facilityMaster.getFacilityMasterId(), eachSpeciality);
         }
 
         List<SpecialityMaster> specialityMaster = getSpecialityByFacilityId(facilityMaster.getFacilityMasterId());
