@@ -78,9 +78,25 @@ public class FacilityControllerImpl {
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
         }
 
-        // Defensive handling: treat empty or blank stateCode as null and prefer
-        // server-side resolution of stateCode/stateName. This preserves
-        // backward-compatibility with older frontend payloads.
+    /*
+     * Defensive handling for incoming state information. The frontend may send
+     * the state in multiple shapes (plain stateCode string, a JSON string
+     * containing {"stateCode": "..."}, or a state name). To remain
+     * backward-compatible and robust we resolve the StateMaster here using
+     * the following strategy (in order):
+     *  1) If request.stateCode is a non-empty string, try direct lookup by code.
+     *  2) If direct lookup fails, try to parse request.stateCode as a JSON
+     *     object and extract the "stateCode" field (handles FE serializing
+     *     the whole object as a string).
+     *  3) If still not found, treat the provided string as a state name and
+     *     resolve by name (case-insensitive lookup).
+     *  4) If request.stateCode is empty/null, but request.stateName is
+     *     provided, resolve by state name.
+     *
+     * The resolved StateMaster (or null) is then assigned to facilityMaster.
+     * This keeps payload shape changes on the FE from breaking the API and
+     * avoids requiring DB/schema changes.
+     */
         String incomingStateCode = addOrUpdateFacilityRequest.getStateCode();
         log.info("addOrUpdateFacility called for facilityId={} incomingStateCode='{}'", addOrUpdateFacilityRequest.getFacilityMasterId(), incomingStateCode);
         StateMaster stateMaster = null;
@@ -155,39 +171,32 @@ public class FacilityControllerImpl {
         // when present.
         if (addOrUpdateFacilityRequest != null && addOrUpdateFacilityRequest.getRoomDetails() != null
                 && !addOrUpdateFacilityRequest.getRoomDetails().isEmpty()) {
-            try {
-                List<RoomDetail> rd = new java.util.ArrayList<>();
-                int idx = 0;
-                for (Object raw : addOrUpdateFacilityRequest.getRoomDetails()) {
-                    idx++;
-                    if (raw == null) continue;
-                    // raw is expected to be a Map-like structure (Jackson will have deserialized JSON)
-                    if (raw instanceof java.util.Map) {
-                        @SuppressWarnings("unchecked")
-                        java.util.Map<String, Object> map = (java.util.Map<String, Object>) raw;
-                        RoomDetail r = new RoomDetail();
-                        Object rn = map.get("roomNumber");
-                        if (rn instanceof Number) r.setRoomNumber(((Number) rn).intValue());
-                        else r.setRoomNumber(idx);
-                        Object rl = map.get("roomLabel");
-                        r.setRoomLabel(rl != null ? String.valueOf(rl) : ("Room " + r.getRoomNumber()));
-                        java.util.List<String> specIds = new java.util.ArrayList<>();
-                        Object listObj = map.get("specialityList");
-                        if (listObj instanceof java.util.List) {
-                            for (Object o : (java.util.List<?>) listObj) {
-                                if (o != null) specIds.add(String.valueOf(o));
-                            }
+            List<RoomDetail> rd = new java.util.ArrayList<>();
+            int idx = 0;
+            for (Object raw : addOrUpdateFacilityRequest.getRoomDetails()) {
+                idx++;
+                if (raw == null) continue;
+                if (raw instanceof java.util.Map) {
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> map = (java.util.Map<String, Object>) raw;
+                    RoomDetail r = new RoomDetail();
+                    Object rn = map.get("roomNumber");
+                    if (rn instanceof Number) r.setRoomNumber(((Number) rn).intValue());
+                    else r.setRoomNumber(idx);
+                    Object rl = map.get("roomLabel");
+                    r.setRoomLabel(rl != null ? String.valueOf(rl) : ("Room " + r.getRoomNumber()));
+                    java.util.List<String> specIds = new java.util.ArrayList<>();
+                    Object listObj = map.get("specialityList");
+                    if (listObj instanceof java.util.List) {
+                        for (Object o : (java.util.List<?>) listObj) {
+                            if (o != null) specIds.add(String.valueOf(o));
                         }
-                        r.setSpecialityList(specIds);
-                        rd.add(r);
                     }
+                    r.setSpecialityList(specIds);
+                    rd.add(r);
                 }
-                facilityDetails.setRoomDetails(rd);
-            } catch (Exception e) {
-                // Non-fatal: if parsing fails, omit roomDetails and continue
-                // log at debug level
-                log.debug("Failed to populate roomDetails from request: {}", e.getMessage());
             }
+            facilityDetails.setRoomDetails(rd);
         }
         if (facilityMaster.getStateCode() != null) {
             facilityDetails.setStateCode(facilityMaster.getStateCode().getStateCode());
