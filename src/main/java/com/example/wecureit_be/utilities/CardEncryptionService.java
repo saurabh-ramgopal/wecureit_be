@@ -50,5 +50,39 @@ public class CardEncryptionService {
         return new String(plainBytes, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Encrypt multiple plain values using a single DEK and IV and return all encrypted
+     * values plus the wrapped DEK and IV (all Base64 encoded).
+     * Note: this keeps the original pattern of using one wrapped DEK and one IV per card.
+     */
+    public EncryptedMultiple encryptMultiple(String... plainValues) throws Exception {
+        // Generate DEK
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(256);
+        SecretKey dek = keyGen.generateKey();
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
+        String[] encrypted = new String[plainValues.length];
+        String[] ivs = new String[plainValues.length];
+        for (int i = 0; i < plainValues.length; i++) {
+            byte[] iv = new byte[12];
+            random.nextBytes(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, dek, new GCMParameterSpec(128, iv));
+            byte[] cipherText = cipher.doFinal(plainValues[i].getBytes(StandardCharsets.UTF_8));
+            encrypted[i] = Base64.getEncoder().encodeToString(cipherText);
+            ivs[i] = Base64.getEncoder().encodeToString(iv);
+            Arrays.fill(plainValues[i].toCharArray(), '\0'); // clear sensitive data
+        }
+
+        // Wrap DEK using master key
+        byte[] wrappedDek = kmsService.wrapKey(dek);
+
+        return new EncryptedMultiple(encrypted, Base64.getEncoder().encodeToString(wrappedDek), ivs);
+    }
+
+    public record EncryptedMultiple(String[] encryptedValues, String wrappedDek, String[] ivs) {}
+
     public record EncryptedCard(String encryptedPan, String wrappedDek, String iv) {}
 }
+

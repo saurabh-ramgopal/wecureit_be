@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter @Setter
 public class CardRequest {
     private String pan;
+    private String cvc;
     private String brand;
     private int expMonth;
     private int expYear;

@@ -35,17 +35,22 @@ public class CardService {
             }
         }
 
-        var encrypted = encryptService.encryptCard(req.getPan());
-        Card card = new Card();
-        card.setEncryptedPan(encrypted.encryptedPan());
-        card.setWrappedDek(encrypted.wrappedDek());
-        card.setIv(encrypted.iv());
+    // Encrypt PAN and CVC using same DEK but unique IV per field
+    var multi = encryptService.encryptMultiple(req.getPan(), req.getCvc());
+    String[] encryptedVals = multi.encryptedValues();
+    String[] ivs = multi.ivs();
+
+    Card card = new Card();
+    card.setEncryptedPan(encryptedVals.length > 0 ? encryptedVals[0] : null);
+    card.setEncryptedCvc(encryptedVals.length > 1 ? encryptedVals[1] : null);
+    card.setWrappedDek(multi.wrappedDek());
+    // store IVs per-field
+    card.setIv(ivs.length > 0 ? ivs[0] : null);
+    card.setCvcIv(ivs.length > 1 ? ivs[1] : null);
         card.setLast4(req.getPan().substring(req.getPan().length() - 4));
         card.setBrand(req.getBrand());
         card.setExpMonth(req.getExpMonth());
         card.setExpYear(req.getExpYear());
-        // fetch PatientMaster and set the relation
-        // PatientMaster pm = patientController.getById(req.getPatientMasterId());
         card.setPatientMaster(pm);
         return repo.save(card);
     }

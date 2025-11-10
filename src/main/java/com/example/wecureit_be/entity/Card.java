@@ -21,6 +21,12 @@ public class Card {
     @Column(columnDefinition = "TEXT")
     private String iv;
 
+    @Column(columnDefinition = "TEXT")
+    private String encryptedCvc;
+
+    @Column(columnDefinition = "TEXT")
+    private String cvcIv;
+
     private String last4;
     private String brand;
     private int expMonth;
