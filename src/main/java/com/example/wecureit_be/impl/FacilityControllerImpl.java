@@ -78,58 +78,19 @@ public class FacilityControllerImpl {
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
         }
 
-    /*
-     * Defensive handling for incoming state information. The frontend may send
-     * the state in multiple shapes (plain stateCode string, a JSON string
-     * containing {"stateCode": "..."}, or a state name). To remain
-     * backward-compatible and robust we resolve the StateMaster here using
-     * the following strategy (in order):
-     *  1) If request.stateCode is a non-empty string, try direct lookup by code.
-     *  2) If direct lookup fails, try to parse request.stateCode as a JSON
-     *     object and extract the "stateCode" field (handles FE serializing
-     *     the whole object as a string).
-     *  3) If still not found, treat the provided string as a state name and
-     *     resolve by name (case-insensitive lookup).
-     *  4) If request.stateCode is empty/null, but request.stateName is
-     *     provided, resolve by state name.
-     *
-     * The resolved StateMaster (or null) is then assigned to facilityMaster.
-     * This keeps payload shape changes on the FE from breaking the API and
-     * avoids requiring DB/schema changes.
-     */
         String incomingStateCode = addOrUpdateFacilityRequest.getStateCode();
         log.info("addOrUpdateFacility called for facilityId={} incomingStateCode='{}'", addOrUpdateFacilityRequest.getFacilityMasterId(), incomingStateCode);
         StateMaster stateMaster = null;
         if (incomingStateCode != null && !incomingStateCode.trim().isEmpty()) {
             String codeCandidate = incomingStateCode.trim();
-            // First try direct code lookup
             stateMaster = stateMasterRepository.getStateById(codeCandidate);
             log.info("Resolved stateMaster for code='{}' ? {}", codeCandidate, (stateMaster != null));
 
-            // If not found, attempt to parse incomingStateCode in case FE sent a JSON object as a string
-            if (stateMaster == null) {
-                try {
-                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    @SuppressWarnings("unchecked")
-                    java.util.Map<String, Object> parsed = mapper.readValue(codeCandidate, java.util.Map.class);
-                    Object parsedCode = parsed.get("stateCode");
-                    if (parsedCode != null) {
-                        String parsedCodeStr = String.valueOf(parsedCode).trim();
-                        stateMaster = stateMasterRepository.getStateById(parsedCodeStr);
-                        log.info("Parsed incomingStateCode JSON and looked up stateCode='{}' ? {}", parsedCodeStr, (stateMaster != null));
-                    }
-                } catch (Exception ex) {
-                    log.debug("incomingStateCode not JSON or parse failed: {}", ex.getMessage());
-                }
-            }
-
-            // If still not found, try resolving by name using the incomingStateCode string as a name
             if (stateMaster == null) {
                 stateMaster = stateMasterRepository.getStateByName(codeCandidate);
                 log.info("Fallback lookup by name for '{}' ? {}", codeCandidate, (stateMaster != null));
             }
         } else {
-            // If the request contained a stateName field, try resolving by that too
             String incomingStateName = addOrUpdateFacilityRequest.getStateName();
             if (incomingStateName != null && !incomingStateName.trim().isEmpty()) {
                 stateMaster = stateMasterRepository.getStateByName(incomingStateName.trim());
@@ -146,8 +107,6 @@ public class FacilityControllerImpl {
         facilityMaster.setIsActive(true);
         facilityMasterRepository.save(facilityMaster);
 
-        // delete existing mappings and re-insert using a native insert helper so
-        // state_code (when present) is written explicitly.
     facilitySpecialityMappingRepository.deleteFacilityAllSpeciality(facilityMaster.getFacilityMasterId());
 
         for(String eachSpeciality : addOrUpdateFacilityRequest.getSpecialityList() ){
@@ -164,11 +123,6 @@ public class FacilityControllerImpl {
 
         BeanUtils.copyProperties(facilityMaster, facilityDetails);
         facilityDetails.setSpeciality(specialityMaster);
-        // If the incoming request contained explicit roomDetails, echo those back
-        // in the response so the FE can render per-room specialties without
-        // requiring DB schema changes. The AddOrUpdateFacilityRequest may include
-        // roomDetails as an array of objects with a specialityList; use that
-        // when present.
         if (addOrUpdateFacilityRequest != null && addOrUpdateFacilityRequest.getRoomDetails() != null
                 && !addOrUpdateFacilityRequest.getRoomDetails().isEmpty()) {
             List<RoomDetail> rd = new java.util.ArrayList<>();

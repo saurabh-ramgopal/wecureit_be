@@ -176,34 +176,13 @@ public class DoctorControllerImpl {
     }
 
     public DoctorMaster deleteDoctor(DeleteDoctorRequest deleteDoctorRequest){
+        // Revert to soft-delete behavior to match origin/main: update isActive flag only.
         Integer doctorId = deleteDoctorRequest.getDoctorMasterId();
-        Boolean isActive = deleteDoctorRequest.getIsActive();
-
         if (doctorId == null) return null;
 
-        // If frontend indicates isActive == false, perform a hard delete (remove mappings then doctor)
-        if (Boolean.FALSE.equals(isActive)) {
-            // delete speciality mappings first to avoid FK constraint violations
-            doctorSpecialityMappingRepository.deleteDoctorAllSpeciality(doctorId);
-            // delete doctor record
-            try {
-                doctorMasterRepository.deleteById(doctorId);
-            } catch (Exception ex) {
-                // fall back to soft-delete if hard delete fails
-                DoctorMaster doctorMaster = doctorMasterRepository.getDoctorById(doctorId);
-                if (doctorMaster != null) {
-                    doctorMaster.setIsActive(false);
-                    return doctorMasterRepository.save(doctorMaster);
-                }
-                return null;
-            }
-            return null;
-        }
-
-        // Default behavior: update isActive flag (soft delete / restore)
         DoctorMaster doctorMaster = doctorMasterRepository.getDoctorById(doctorId);
         if (doctorMaster == null) return null;
-        doctorMaster.setIsActive(isActive);
+        doctorMaster.setIsActive(deleteDoctorRequest.getIsActive());
         return doctorMasterRepository.save(doctorMaster);
     }
 
