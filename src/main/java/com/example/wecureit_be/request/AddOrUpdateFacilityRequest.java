@@ -13,7 +13,5 @@ public class AddOrUpdateFacilityRequest {
     String stateCode;
     String stateName;
     List<String> specialityList;
-    // Optional per-room details sent by the FE. Each element is expected to be an
-    // object containing keys like roomNumber, roomLabel and specialityList.
     List<Object> roomDetails;
 }
