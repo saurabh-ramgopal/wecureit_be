@@ -1,8 +1,8 @@
 package com.example.wecureit_be.request;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class AddDoctorRequest {
@@ -10,7 +10,5 @@ public class AddDoctorRequest {
     String doctorGender;
     String doctorEmail;
     String doctorPassword;
-    Integer doctorMasterId;
-    List<String> specialityList;
-    List<com.example.wecureit_be.request.DoctorStateSpeciality> doctorStateSpeciality;
+    List<DoctorStateSpeciality> doctorStateSpeciality;
 }
