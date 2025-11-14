@@ -12,10 +12,7 @@ import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.entity.DoctorSpecialityMapping;
 import com.example.wecureit_be.entity.SpecialityMaster;
 import com.example.wecureit_be.entity.StateMaster;
-import com.example.wecureit_be.repository.DoctorMasterRepository;
-import com.example.wecureit_be.repository.DoctorSpecialityMappingRepository;
-import com.example.wecureit_be.repository.SpecialityMasterRepository;
-import com.example.wecureit_be.repository.StateMasterRepository;
+import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.AddDoctorRequest;
 import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorStateSpeciality;
@@ -26,9 +23,12 @@ import com.example.wecureit_be.repository.DoctorFacilityAvailabilityRepository;
 import com.example.wecureit_be.entity.DoctorFacilityAvailability;
 import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.utilities.Utils;
+import com.example.wecureit_be.response.DoctorFacilities;
 
 @Service
 public class DoctorControllerImpl {
+
+    private final FacilityMasterRepository facilityMasterRepository;
 
     @Autowired
     DoctorMasterRepository doctorMasterRepository;
@@ -44,6 +44,10 @@ public class DoctorControllerImpl {
 
     @Autowired
     StateMasterRepository stateMasterRepository;
+
+    DoctorControllerImpl(FacilityMasterRepository facilityMasterRepository) {
+        this.facilityMasterRepository = facilityMasterRepository;
+    }
 
     public List<DoctorDetails> getAllDoctors(){
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
@@ -248,5 +252,9 @@ public class DoctorControllerImpl {
             doctorFacilityAvailabilityRepository.save(doctorFacilityAvailability);
         }
         return new AddDoctorAvailabilityResponse(request.getDoctorId(), request.getFacilityList());
+    }
+
+    public List<DoctorFacilities> getFacilitiesForDoctor(Integer doctorId) {
+        return facilityMasterRepository.getFacilitiesForDoctor(doctorId);
     }
 }
