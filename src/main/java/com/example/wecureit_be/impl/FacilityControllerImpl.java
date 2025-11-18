@@ -76,7 +76,8 @@ public class FacilityControllerImpl {
         int rows = facilitySpecialityMappingRepository.deleteFacilityAllSpeciality(facilityMaster.getFacilityMasterId());
 
         for(String eachSpeciality : addOrUpdateFacilityRequest.getSpecialityList() ){
-            facilitySpecialityMappingRepository.insertIntoFacilitySpecialityMapping(facilityMaster.getFacilityMasterId(), eachSpeciality);
+            facilitySpecialityMappingRepository.insertIntoFacilitySpecialityMapping(facilityMaster.getFacilityMasterId(),
+                    eachSpeciality, Utils.generateUUID());
         }
 
         List<SpecialityMaster> specialityMaster = getSpecialityByFacilityId(facilityMaster.getFacilityMasterId());
