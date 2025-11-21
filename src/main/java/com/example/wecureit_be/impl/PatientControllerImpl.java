@@ -48,6 +48,7 @@ public class PatientControllerImpl {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("patientMasterId", patientMaster.getPatientMasterId());
+        claims.put("role", "patient");
         FirebaseAuth.getInstance().setCustomUserClaims(patientRegistrationRequest.getFirebaseUid(), claims);
 
         System.out.println("Claims updated for user: " + patientRegistrationRequest.getFirebaseUid());
