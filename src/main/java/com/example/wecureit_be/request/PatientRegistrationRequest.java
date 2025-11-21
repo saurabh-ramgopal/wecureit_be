@@ -12,4 +12,5 @@ public class PatientRegistrationRequest {
     LocalDate dob;
     String gender;
     String phone;
+    String firebaseUid;
 }

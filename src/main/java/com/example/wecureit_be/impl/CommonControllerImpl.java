@@ -39,7 +39,8 @@ public class CommonControllerImpl {
             return new LoginResponse(commonLoginRequest.getEmail(), commonLoginRequest.getType(), "FAIL", "The user does not exist in system. Please sign up.");
         }
         else if (!ObjectUtils.isEmpty(patientMaster.getPatientMasterId())) {
-            password = patientMaster.getPatientPassword();
+//            password = patientMaster.getPatientPassword();
+            password = "";
             email = patientMaster.getPatientEmail();
         }
         else {

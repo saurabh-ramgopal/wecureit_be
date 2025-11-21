@@ -3,6 +3,7 @@ package com.example.wecureit_be.controller;
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
+import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class PatientController {
     }
 
     @PostMapping(value="/registration")
-    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
+    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest) throws FirebaseAuthException {
         return patientControllerImpl.newRegistration(patientRegistrationRequest);
     }
 
