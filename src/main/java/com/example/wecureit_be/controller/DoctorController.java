@@ -6,7 +6,8 @@ import com.example.wecureit_be.response.AddDoctorAvailabilityResponse;
 import com.example.wecureit_be.response.DoctorDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.wecureit_be.response.DoctorFacilities;
+import java.util.*;
 
 @RestController
 @RequestMapping("/doctor")
@@ -23,6 +24,11 @@ public class DoctorController {
     @PostMapping(value = "/availability/add")
     public AddDoctorAvailabilityResponse addAvailability(@RequestBody AddDoctorAvailabilityRequest addDoctorAvailabilityRequest) {
         return doctorControllerImpl.addAvailability(addDoctorAvailabilityRequest);
+    }
+
+    @GetMapping(value="facilities/getById")
+    public List<DoctorFacilities> getFacilitiesForDoctor(@RequestParam Integer doctorId) {
+        return doctorControllerImpl.getFacilitiesForDoctor(doctorId);
     }
 
 }
