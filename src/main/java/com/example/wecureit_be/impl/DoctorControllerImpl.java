@@ -1,26 +1,39 @@
 package com.example.wecureit_be.impl;
 
-import com.example.wecureit_be.entity.*;
-import com.example.wecureit_be.repository.*;
-import com.example.wecureit_be.request.*;
-import com.example.wecureit_be.response.AddDoctorAvailabilityResponse;
-import com.example.wecureit_be.response.DoctorDetails;
-import com.example.wecureit_be.response.DoctorSpecialityDetails;
-import com.example.wecureit_be.response.DoctorStateDetails;
-import com.example.wecureit_be.utilities.Utils;
-import com.google.firebase.auth.FirebaseAuth;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.wecureit_be.entity.DoctorMaster;
+import com.example.wecureit_be.entity.DoctorSpecialityMapping;
+import com.example.wecureit_be.entity.SpecialityMaster;
+import com.example.wecureit_be.entity.StateMaster;
+import com.example.wecureit_be.repository.*;
+import com.example.wecureit_be.request.AddDoctorRequest;
+import com.example.wecureit_be.request.DeleteDoctorRequest;
+import com.example.wecureit_be.request.DoctorStateSpeciality;
+import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
+import com.example.wecureit_be.request.AddDoctorAvailabilityList;
+import com.example.wecureit_be.response.AddDoctorAvailabilityResponse;
+import com.example.wecureit_be.entity.DoctorFacilityAvailability;
+import com.example.wecureit_be.response.DoctorDetails;
+import com.example.wecureit_be.utilities.Utils;
+import com.example.wecureit_be.response.DoctorFacilities;
+import com.example.wecureit_be.response.DoctorSpecialityDetails;
+import com.example.wecureit_be.response.DoctorStateDetails;
+import com.google.firebase.auth.FirebaseAuth;
+import lombok.SneakyThrows;
+import java.util.HashMap;
+
 @Service
 public class DoctorControllerImpl {
+
+    @Autowired
+    private final FacilityMasterRepository facilityMasterRepository;
 
     @Autowired
     DoctorMasterRepository doctorMasterRepository;
@@ -33,6 +46,13 @@ public class DoctorControllerImpl {
 
     @Autowired
     DoctorFacilityAvailabilityRepository doctorFacilityAvailabilityRepository;
+
+    @Autowired
+    StateMasterRepository stateMasterRepository;
+
+    DoctorControllerImpl(FacilityMasterRepository facilityMasterRepository) {
+        this.facilityMasterRepository = facilityMasterRepository;
+    }
 
     public List<DoctorDetails> getAllDoctors(){
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
@@ -151,4 +171,9 @@ public class DoctorControllerImpl {
         }
         return new AddDoctorAvailabilityResponse(request.getDoctorId(), request.getFacilityList());
     }
+
+    public List<DoctorFacilities> getFacilitiesForDoctor(Integer doctorId) {
+        return facilityMasterRepository.getFacilitiesForDoctor(doctorId);
+    }
+
 }

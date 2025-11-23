@@ -7,7 +7,10 @@ import com.example.wecureit_be.utilities.Utils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import com.example.wecureit_be.request.PatientUpdateRequest;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.HashMap;
@@ -21,7 +24,25 @@ public class PatientControllerImpl {
     PatientMasterRepository patientMasterRepository;
 
     public PatientMaster addOrUpdate(PatientMaster patientMaster) {
-        return patientMasterRepository.save(patientMaster);
+        // Only allow updating email and phone for an existing patient.
+        if (patientMaster == null || patientMaster.getPatientMasterId() == null) {
+            throw new IllegalArgumentException("patientMaster and patientMaster.patientMasterId must be provided for update");
+        }
+
+        PatientMaster existing = patientMasterRepository.getPatientById(patientMaster.getPatientMasterId());
+        if (existing == null) {
+            throw new IllegalArgumentException("Patient with id " + patientMaster.getPatientMasterId() + " does not exist");
+        }
+
+        // Only update allowed fields
+        if (patientMaster.getPatientEmail() != null) {
+            existing.setPatientEmail(patientMaster.getPatientEmail());
+        }
+        if (patientMaster.getPatientPhone() != null) {
+            existing.setPatientPhone(patientMaster.getPatientPhone());
+        }
+
+        return patientMasterRepository.save(existing);
     }
 
     public PatientMaster getById(Integer patientId) {
@@ -53,6 +74,25 @@ public class PatientControllerImpl {
         System.out.println("Claims updated for user: " + patientRegistrationRequest.getFirebaseUid());
         return patientMaster;
 
+    }
+
+    public PatientMaster updatePatient(Integer patientId, PatientUpdateRequest updateRequest) {
+        if (patientId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "patientId is required");
+        }
+        PatientMaster existing = patientMasterRepository.getPatientById(patientId);
+        if (existing == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found");
+        }
+
+        if (updateRequest.getEmail() != null) {
+            existing.setPatientEmail(updateRequest.getEmail());
+        }
+        if (updateRequest.getPhone() != null) {
+            existing.setPatientPhone(updateRequest.getPhone());
+        }
+
+        return patientMasterRepository.save(existing);
     }
 
 }
