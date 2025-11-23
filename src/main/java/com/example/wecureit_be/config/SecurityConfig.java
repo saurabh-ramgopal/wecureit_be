@@ -34,6 +34,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/patient/registration").permitAll() // skipping auth endpoint
+                        .requestMatchers("/admin/register").permitAll() // skipping auth endpoint
+                        .requestMatchers("/admin/addDoctor").permitAll() // skipping auth endpoint
+                        .requestMatchers("/**").permitAll() // skipping auth endpoint
                         .anyRequest().authenticated()
                 )
                 // Add our custom Firebase filter before the standard login filter
