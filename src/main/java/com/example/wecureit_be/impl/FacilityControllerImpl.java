@@ -110,4 +110,9 @@ public class FacilityControllerImpl {
         return facilityMasterRepository.save(facilityMaster);
 
     }
+
+    public List<StateMaster> getAllStates(){
+        return stateMasterRepository.getStates();
+    }
+
 }
