@@ -8,10 +8,13 @@ import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.response.DoctorSpecialityDetails;
 import com.example.wecureit_be.response.DoctorStateDetails;
 import com.example.wecureit_be.utilities.Utils;
+import com.google.firebase.auth.FirebaseAuth;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,19 +45,27 @@ public class DoctorControllerImpl {
         return listOfDoctorDetails;
     }
 
+    @SneakyThrows
     public DoctorDetails addDoctor(AddDoctorRequest addDoctorRequest){
         DoctorMaster doctorMaster = new DoctorMaster();
         doctorMaster.setDoctorMasterId(Utils.generateFiveDigitNumber());
         doctorMaster.setDoctorName(addDoctorRequest.getDoctorName());
         doctorMaster.setDoctorGender(addDoctorRequest.getDoctorGender());
-        doctorMaster.setDoctorPassword(addDoctorRequest.getDoctorPassword());
         doctorMaster.setDoctorEmail(addDoctorRequest.getDoctorEmail());
         doctorMaster.setIsActive(true);
         doctorMasterRepository.save(doctorMaster);
 
-        return updateDoctorStateSpecialities(doctorMaster.getDoctorMasterId(),
+        DoctorDetails doctorDetails = updateDoctorStateSpecialities(doctorMaster.getDoctorMasterId(),
                 addDoctorRequest.getDoctorStateSpeciality());
 
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("doctorMasterId", doctorDetails.getDoctorMasterId());
+        claims.put("role", "doctor");
+        FirebaseAuth.getInstance().setCustomUserClaims(addDoctorRequest.getFirebaseUid(), claims);
+
+        System.out.println("Claims updated for user: " + addDoctorRequest.getFirebaseUid());
+
+        return doctorDetails;
     }
 
     public DoctorDetails updateDoctorStateSpecialities(Integer doctorId, List<DoctorStateSpeciality> listOfDoctorStateSpecialities){

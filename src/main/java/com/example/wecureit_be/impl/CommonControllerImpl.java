@@ -44,7 +44,8 @@ public class CommonControllerImpl {
             email = patientMaster.getPatientEmail();
         }
         else {
-            password = doctorMaster.getDoctorPassword();
+//            password = doctorMaster.getDoctorPassword();
+            password = "";
             email = doctorMaster.getDoctorEmail();
         }
 

@@ -3,7 +3,8 @@ package com.example.wecureit_be.request;
 import lombok.Data;
 
 @Data
-public class AdminLoginRequest {
+public class AdminRegisterRequest {
     String email;
-    String password;
+    String name;
+    String firebaseUid;
 }

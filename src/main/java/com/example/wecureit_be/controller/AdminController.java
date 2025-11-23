@@ -1,10 +1,11 @@
 package com.example.wecureit_be.controller;
 
+import com.example.wecureit_be.entity.AdminMaster;
 import com.example.wecureit_be.entity.DoctorMaster;
 import com.example.wecureit_be.impl.AdminControllerImpl;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
 import com.example.wecureit_be.request.AddDoctorRequest;
-import com.example.wecureit_be.request.AdminLoginRequest;
+import com.example.wecureit_be.request.AdminRegisterRequest;
 import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorSpecialityRequest;
 import com.example.wecureit_be.response.DoctorDetails;
@@ -24,9 +25,9 @@ public class AdminController {
     @Autowired
     AdminControllerImpl adminControllerImpl;
 
-    @PostMapping(value="/login")
-    public LoginResponse checkLoginCredentials (@RequestBody AdminLoginRequest adminLoginRequest){
-        return adminControllerImpl.checkLoginCredentials(adminLoginRequest);
+    @PostMapping(value="/register")
+    public AdminMaster registerAdmin(@RequestBody AdminRegisterRequest adminRegisterRequest){
+        return adminControllerImpl.registerAdmin(adminRegisterRequest);
     }
 
     @GetMapping(value="/getAllDoctors")

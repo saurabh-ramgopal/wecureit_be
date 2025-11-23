@@ -25,7 +25,7 @@ public class PatientController {
     }
 
     @PostMapping(value="/registration")
-    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest) throws FirebaseAuthException {
+    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest) {
         return patientControllerImpl.newRegistration(patientRegistrationRequest);
     }
 

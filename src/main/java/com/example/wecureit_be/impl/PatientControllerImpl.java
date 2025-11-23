@@ -4,13 +4,11 @@ import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.repository.PatientMasterRepository;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
 import com.example.wecureit_be.utilities.Utils;
-import com.google.firebase.auth.FirebaseAuthException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserRecord;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +32,8 @@ public class PatientControllerImpl {
         return patientMasterRepository.getPatientByEmail(patientEmail);
     }
 
-    public PatientMaster newRegistration(PatientRegistrationRequest patientRegistrationRequest) throws FirebaseAuthException {
+    @SneakyThrows
+    public PatientMaster newRegistration(PatientRegistrationRequest patientRegistrationRequest){
         log.info("adding new patient details:{}", patientRegistrationRequest.getName());
         PatientMaster patientMaster = new PatientMaster();
         patientMaster.setPatientMasterId(Utils.generateFiveDigitNumber()); //to-do change accordingly when auto-increment implemented

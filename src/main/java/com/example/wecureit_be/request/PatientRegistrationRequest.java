@@ -8,7 +8,6 @@ import java.time.LocalDate;
 public class PatientRegistrationRequest {
     String name;
     String email;
-    String password;
     LocalDate dob;
     String gender;
     String phone;
