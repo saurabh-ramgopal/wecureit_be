@@ -5,8 +5,6 @@ import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
 import com.example.wecureit_be.request.PatientUpdateRequest;
 import jakarta.validation.Valid;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 @RestController
@@ -36,7 +34,7 @@ public class PatientController {
     }
 
     @PostMapping(value="/registration")
-    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest){
+    public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest) {
         return patientControllerImpl.newRegistration(patientRegistrationRequest);
     }
 

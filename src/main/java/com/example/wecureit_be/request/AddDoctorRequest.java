@@ -9,6 +9,6 @@ public class AddDoctorRequest {
     String doctorName;
     String doctorGender;
     String doctorEmail;
-    String doctorPassword;
+    String firebaseUid;
     List<DoctorStateSpeciality> doctorStateSpeciality;
 }
