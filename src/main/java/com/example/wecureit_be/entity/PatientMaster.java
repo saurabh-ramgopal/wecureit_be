@@ -30,4 +30,7 @@ public class PatientMaster {
 
     @Column(name = "patient_phone")
     public String patientPhone;
+
+    @Column(name = "patient_address")
+    public String patientAddress;
 }

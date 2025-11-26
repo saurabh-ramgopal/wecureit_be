@@ -28,9 +28,11 @@ public class Card {
     private String cvcIv;
 
     private String last4;
-    private String brand;
     private int expMonth;
     private int expYear;
+
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
+    private Boolean isActive = true;
 
     @ManyToOne
     @JoinColumn(name = "patient_master_id", referencedColumnName = "patient_master_id")
