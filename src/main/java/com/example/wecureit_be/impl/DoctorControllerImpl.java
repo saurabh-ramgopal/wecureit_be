@@ -5,26 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.example.wecureit_be.entity.*;
+import com.example.wecureit_be.response.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.wecureit_be.entity.DoctorMaster;
-import com.example.wecureit_be.entity.DoctorSpecialityMapping;
-import com.example.wecureit_be.entity.SpecialityMaster;
-import com.example.wecureit_be.entity.StateMaster;
 import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.AddDoctorRequest;
 import com.example.wecureit_be.request.DeleteDoctorRequest;
 import com.example.wecureit_be.request.DoctorStateSpeciality;
 import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
 import com.example.wecureit_be.request.AddDoctorAvailabilityList;
-import com.example.wecureit_be.response.AddDoctorAvailabilityResponse;
-import com.example.wecureit_be.entity.DoctorFacilityAvailability;
-import com.example.wecureit_be.response.DoctorDetails;
 import com.example.wecureit_be.utilities.Utils;
-import com.example.wecureit_be.response.DoctorFacilities;
-import com.example.wecureit_be.response.DoctorSpecialityDetails;
-import com.example.wecureit_be.response.DoctorStateDetails;
 import com.google.firebase.auth.FirebaseAuth;
 import lombok.SneakyThrows;
 import java.util.HashMap;
@@ -46,9 +39,6 @@ public class DoctorControllerImpl {
 
     @Autowired
     DoctorFacilityAvailabilityRepository doctorFacilityAvailabilityRepository;
-
-    @Autowired
-    StateMasterRepository stateMasterRepository;
 
     DoctorControllerImpl(FacilityMasterRepository facilityMasterRepository) {
         this.facilityMasterRepository = facilityMasterRepository;
@@ -172,8 +162,42 @@ public class DoctorControllerImpl {
         return new AddDoctorAvailabilityResponse(request.getDoctorId(), request.getFacilityList());
     }
 
-    public List<DoctorFacilities> getFacilitiesForDoctor(Integer doctorId) {
-        return facilityMasterRepository.getFacilitiesForDoctor(doctorId);
+    public List<FacilityDetails> getFacilitiesForDoctor(Integer doctorId) {
+        List<DoctorFacilities> doctorEligibleFacilities = facilityMasterRepository.getFacilitiesForDoctor(doctorId);
+        Map<String, List<String>> facilityMap = new HashMap<>();
+
+        for(DoctorFacilities eachFacility : doctorEligibleFacilities){
+            if(facilityMap.containsKey(eachFacility.getFacilityMasterId())){
+                List<String> myList = facilityMap.get(eachFacility.getFacilityMasterId());
+                myList.add(eachFacility.getSpecialityMasterId());
+            }
+            else{
+                List<String> facilityTempList = new ArrayList<>();
+                facilityTempList.add(eachFacility.getSpecialityMasterId());
+                facilityMap.put(eachFacility.getFacilityMasterId(), facilityTempList);
+            }
+        }
+
+        List<FacilityDetails> responseList = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : facilityMap.entrySet()) {
+            FacilityMaster facilityMaster = facilityMasterRepository.getFacilityById(entry.getKey());
+
+            FacilityDetails facilityDetail = new FacilityDetails();
+
+            List<SpecialityMaster> facilitySpecialitiesByDoc = new ArrayList<>();
+            for(String specialityId : entry.getValue()){
+                SpecialityMaster specialityMaster = specialityMasterRepository.getSpecialityById(specialityId);
+                facilitySpecialitiesByDoc.add(specialityMaster);
+            }
+
+            BeanUtils.copyProperties(facilityMaster, facilityDetail);
+            facilityDetail.setSpeciality(facilitySpecialitiesByDoc);
+            facilityDetail.setStateCode(facilityMaster.getStateCode().getStateCode());
+            facilityDetail.setStateName(facilityMaster.getStateCode().getStateName());
+            responseList.add(facilityDetail);
+        }
+
+        return responseList;
     }
 
 }

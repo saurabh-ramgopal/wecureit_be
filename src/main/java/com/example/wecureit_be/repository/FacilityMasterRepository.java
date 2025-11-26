@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import javax.print.Doc;
-
 @Repository
 public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, String> {
 
@@ -21,6 +19,7 @@ public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, 
     @Query(value = "SELECT * FROM facility_master where facility_master_id = :facilityMasterId", nativeQuery = true)
     FacilityMaster getFacilityById(@Param("facilityMasterId") String facilityMasterId);
 
+    // todo Ullas - facility table isActive filter
     @Query(
         value = """
             WITH doctor_state_specs AS (
@@ -30,15 +29,13 @@ public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, 
                 FROM doctor_speciality_mapping dsm
                 WHERE dsm.doctor_master_id = :doctorId
             )
-            SELECT DISTINCT 
-                fm.facility_master_id, fm.facility_name, fm.state_code, fm.no_of_rooms, fm.is_active
+            SELECT DISTINCT fm.facility_master_id , fsm.speciality_master_id
             FROM facility_master fm
             JOIN facility_speciality_mapping fsm 
                 ON fm.facility_master_id = fsm.facility_master_id
             JOIN doctor_state_specs dss
                 ON dss.state_code = fm.state_code
                 AND dss.speciality_master_id = fsm.speciality_master_id
-			ORDER BY fm.state_code, fm.facility_name
             """,
         nativeQuery = true
     )
