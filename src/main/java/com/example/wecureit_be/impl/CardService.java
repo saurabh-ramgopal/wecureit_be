@@ -48,7 +48,7 @@ public class CardService {
     card.setIv(ivs.length > 0 ? ivs[0] : null);
     card.setCvcIv(ivs.length > 1 ? ivs[1] : null);
         card.setLast4(req.getPan().substring(req.getPan().length() - 4));
-        card.setBrand(req.getBrand());
+        // card.setBrand(req.getBrand()); --- IGNORE ---
         card.setExpMonth(req.getExpMonth());
         card.setExpYear(req.getExpYear());
         card.setPatientMaster(pm);

@@ -64,6 +64,7 @@ public class PatientControllerImpl {
         patientMaster.setPatientDob(patientRegistrationRequest.getDob());
         patientMaster.setPatientGender(patientRegistrationRequest.getGender());
         patientMaster.setPatientPhone(patientRegistrationRequest.getPhone());
+        patientMaster.setPatientAddress(patientRegistrationRequest.getAddress());
         patientMaster = patientMasterRepository.save(patientMaster);
 
         Map<String, Object> claims = new HashMap<>();

@@ -28,7 +28,6 @@ public class Card {
     private String cvcIv;
 
     private String last4;
-    private String brand;
     private int expMonth;
     private int expYear;
 
