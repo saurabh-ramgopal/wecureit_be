@@ -10,5 +10,6 @@ public class DoctorDetails {
     public String doctorName;
     public String doctorEmail;
     public String doctorGender;
+    public Boolean isActive;
     public List<DoctorStateDetails> stateDetails;
 }
