@@ -43,5 +43,12 @@ public class CardController {
         return cardService.getCardsByPatientId(patientMasterId);
     }
 
+    @PatchMapping("/delete")
+    public ResponseEntity<String> deleteCard(@RequestParam(name = "patientId") Integer patientMasterId) throws Exception {
+        cardService.deleteCard(patientMasterId);
+        return ResponseEntity.ok("Card deleted successfully");
+    }
+
+
 
 }

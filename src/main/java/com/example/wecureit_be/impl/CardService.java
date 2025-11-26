@@ -8,6 +8,8 @@ import com.example.wecureit_be.utilities.CardEncryptionService;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 @Service
 public class CardService {
@@ -41,6 +43,8 @@ public class CardService {
     String[] ivs = multi.ivs();
 
     Card card = new Card();
+    // ensure new card is active by default
+    card.setIsActive(true);
     card.setEncryptedPan(encryptedVals.length > 0 ? encryptedVals[0] : null);
     card.setEncryptedCvc(encryptedVals.length > 1 ? encryptedVals[1] : null);
     card.setWrappedDek(multi.wrappedDek());
@@ -63,5 +67,14 @@ public class CardService {
     public List<String> getCardsByPatientId(Integer patientMasterId) {
         // use derived query to ensure all matching cards are returned and ordered
         return repo.findByPatientMasterPatientMasterIdOrderByIdAsc(patientMasterId);
+    }
+
+    public void deleteCard(Integer patientMasterId) throws Exception{
+        // Handle case where no cards exist for patient
+        List<Card> cards = repo.findAllByPatientMasterPatientMasterIdOrderByIdAsc(patientMasterId);
+        if (cards == null || cards.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No cards found for patient id: " + patientMasterId);
+        }
+        repo.softDeleteById(patientMasterId);
     }
 }
