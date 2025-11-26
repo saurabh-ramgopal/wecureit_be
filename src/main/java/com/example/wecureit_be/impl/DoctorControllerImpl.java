@@ -150,7 +150,7 @@ public class DoctorControllerImpl {
 
         return new DoctorDetails(doctorMaster.getDoctorMasterId(),
                 doctorMaster.getDoctorName(), doctorMaster.getDoctorEmail(),
-                doctorMaster.getDoctorGender(), doctorStateSpecialityList);
+                doctorMaster.getDoctorGender(), doctorMaster.getIsActive(), doctorStateSpecialityList);
     }
 
     public DoctorMaster getByEmail(String doctorEmail) {
