@@ -111,7 +111,6 @@ public class DoctorControllerImpl {
     }
 
 
-    //todo
     public DoctorDetails prepareDocResponse (DoctorMaster doctorMaster, List<DoctorSpecialityMapping> list){
 
         List<DoctorStateDetails> doctorStateSpecialityList = new ArrayList<>();
