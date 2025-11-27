@@ -150,10 +150,13 @@ public class DoctorControllerImpl {
     public AddDoctorAvailabilityResponse addAvailability(AddDoctorAvailabilityRequest request) {
 
         for(AddDoctorAvailabilityList eachFacility : request.getFacilityList()){
+            FacilityMaster facilityMaster = facilityMasterRepository.getFacilityById(eachFacility.getFacilityId());
+            DoctorMaster doctorMaster = doctorMasterRepository.getDoctorById(request.getDoctorId());
+
             DoctorFacilityAvailability doctorFacilityAvailability = new DoctorFacilityAvailability();
             doctorFacilityAvailability.setDfAvailabilityId(Utils.generateUUID());
-            doctorFacilityAvailability.setDoctorMasterId(request.getDoctorId());
-            doctorFacilityAvailability.setFacilityMasterId(eachFacility.getFacilityId());
+            doctorFacilityAvailability.setDoctorMaster(doctorMaster);
+            doctorFacilityAvailability.setFacilityMaster(facilityMaster);
             doctorFacilityAvailability.setAvailableDate(eachFacility.getAvailableDate());
             doctorFacilityAvailability.setAvailableStartTime(eachFacility.getAvailableStartTime());
             doctorFacilityAvailability.setAvailableEndTime(eachFacility.getAvailableEndTime());

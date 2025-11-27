@@ -1,9 +1,6 @@
 package com.example.wecureit_be.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,11 +15,13 @@ public class DoctorFacilityAvailability {
     @Column(name = "df_availability_id")
     public String dfAvailabilityId;
 
-    @Column(name = "doctor_master_id")
-    public Integer doctorMasterId;
+    @ManyToOne
+    @JoinColumn(name = "doctor_master_id")
+    public DoctorMaster doctorMaster;
 
-    @Column(name = "facility_master_id")
-    public String facilityMasterId;
+    @ManyToOne
+    @JoinColumn(name = "facility_master_id")
+    public FacilityMaster facilityMaster;
 
     @Column(name = "available_date")
     public LocalDate availableDate;

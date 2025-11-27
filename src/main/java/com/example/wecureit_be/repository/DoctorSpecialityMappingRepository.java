@@ -31,4 +31,9 @@ public interface DoctorSpecialityMappingRepository extends JpaRepository<DoctorS
                                              @Param("specialityMasterId") String specialityMasterId,
                                              @Param("stateCode") String stateCode);
 
+    @Query(value = "select * from doctor_speciality_mapping " +
+            "where speciality_master_id = :specialityMasterId ", nativeQuery = true)
+    List<DoctorSpecialityMapping> getDoctorsBySpecialityId(@Param("specialityMasterId") String specialityMasterId);
+
+
 }
