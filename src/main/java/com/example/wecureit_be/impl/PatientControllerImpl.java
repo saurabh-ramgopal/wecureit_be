@@ -104,18 +104,18 @@ public class PatientControllerImpl {
         return patientMasterRepository.save(existing);
     }
 
-    public PatientBookingL1Response appointmentBookingL1(PatientBookingRequest patientFilterRequest) {
+    public PatientBookingL1Response appointmentBookingL1(PatientBookingRequest patientBookingRequest) {
 
         // todo saurabh - how to incorporate fac and doc's isActive flags
 
         //Filtering only by doctorId
-        if(!ObjectUtils.isEmpty(patientFilterRequest.getDoctorMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getSpecialityMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getFacilityMasterId())){
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId())){
 
             //fetch facilities
             List<DoctorFacilityAvailability> doctorFacilityAvailabilities =
-                    doctorFacilityAvailabilityRepository.getAvailableFacilityById(patientFilterRequest.getDoctorMasterId());
+                    doctorFacilityAvailabilityRepository.getAvailableFacilityById(patientBookingRequest.getDoctorMasterId());
 
             List<FacilityMaster> facilityMasterList = new ArrayList<>();
             for(DoctorFacilityAvailability each: doctorFacilityAvailabilities){
@@ -144,16 +144,16 @@ public class PatientControllerImpl {
         }
 
         //Filtering only by specialityId
-        if(!ObjectUtils.isEmpty(patientFilterRequest.getSpecialityMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getDoctorMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getFacilityMasterId())){
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId())){
 
             //fetch docs
             List<DoctorMaster> doctorMasterList = new ArrayList<>();
             List<FacilityMaster> facilityMasterList = new ArrayList<>();
 
             List<PractisingSpeciality> allPractisingSpecialities =
-                    practisingSpecialityRepository.getDfaIdBySpecialty(patientFilterRequest.getSpecialityMasterId());
+                    practisingSpecialityRepository.getDfaIdBySpecialty(patientBookingRequest.getSpecialityMasterId());
 
             for(PractisingSpeciality each: allPractisingSpecialities){
                 if(!doctorMasterList.contains(each.getDoctorFacilityAvailability().getDoctorMaster())){
@@ -169,13 +169,13 @@ public class PatientControllerImpl {
         }
 
         //Filtering only by facilityId
-        if(!ObjectUtils.isEmpty(patientFilterRequest.getFacilityMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getSpecialityMasterId()) &&
-                ObjectUtils.isEmpty(patientFilterRequest.getDoctorMasterId())){
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
+                ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId())){
 
             //Fetch docs
             List<DoctorFacilityAvailability> availableDocs =
-                    doctorFacilityAvailabilityRepository.getAvailableDoctorsById(patientFilterRequest.getFacilityMasterId());
+                    doctorFacilityAvailabilityRepository.getAvailableDoctorsById(patientBookingRequest.getFacilityMasterId());
 
             List<DoctorMaster> doctorMasterList = new ArrayList<>();
             for(DoctorFacilityAvailability each: availableDocs){
@@ -205,4 +205,73 @@ public class PatientControllerImpl {
     }
 
 
+    public PatientBookingL1Response appointmentBookingL2(PatientBookingRequest patientBookingRequest) {
+
+        //Filtering by doctorId and facility
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId()) &&
+                !ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId()) &&
+                    ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId())){
+
+            List<DoctorFacilityAvailability> availableBookings =
+                    doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndFacId
+                            (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getFacilityMasterId());
+
+            List<SpecialityMaster> specialityMasterList = new ArrayList<>();
+
+            for(DoctorFacilityAvailability eachAvailability: availableBookings){
+                List<PractisingSpeciality> practisingSpecialityList =
+                        practisingSpecialityRepository.getSpecialitiesByDfaId(eachAvailability.getDfAvailabilityId());
+
+                for(PractisingSpeciality eachSpeciality: practisingSpecialityList){
+                    if(!specialityMasterList.contains(eachSpeciality.getSpecialityMaster())){
+                        specialityMasterList.add(eachSpeciality.getSpecialityMaster());
+                    }
+                }
+            }
+
+            return new PatientBookingL1Response(null, specialityMasterList, null);
+        }
+
+        //Filtering by facility and speciality
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId()) &&
+                !ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
+                    ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId())){
+
+            List<DoctorFacilityAvailability> availableBookings =
+                    doctorFacilityAvailabilityRepository.getAvailabilityByFacIdAndSpecId
+                            (patientBookingRequest.getFacilityMasterId(), patientBookingRequest.getSpecialityMasterId());
+
+            List<DoctorMaster> doctorMasterList = new ArrayList<>();
+
+            for(DoctorFacilityAvailability eachAvailability: availableBookings){
+                if(!doctorMasterList.contains(eachAvailability.getDoctorMaster())){
+                    doctorMasterList.add(eachAvailability.getDoctorMaster());
+                }
+            }
+
+            return new PatientBookingL1Response(null, null, doctorMasterList);
+        }
+
+        //Filtering by speciality and doctorId
+        if(!ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
+                !ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId()) &&
+                    ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId())){
+
+            List<DoctorFacilityAvailability> availableBookings =
+                    doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecId
+                            (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId());
+
+            List<FacilityMaster> facilityMasterList = new ArrayList<>();
+
+            for(DoctorFacilityAvailability eachAvailability: availableBookings){
+                if(!facilityMasterList.contains(eachAvailability.getFacilityMaster())){
+                    facilityMasterList.add(eachAvailability.getFacilityMaster());
+                }
+            }
+
+            return new PatientBookingL1Response(facilityMasterList, null, null);
+        }
+
+        return null;
+    }
 }

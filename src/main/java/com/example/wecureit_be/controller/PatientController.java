@@ -45,4 +45,9 @@ public class PatientController {
         return patientControllerImpl.appointmentBookingL1(patientBookingRequest);
     }
 
+    @PostMapping(value="/bookAppointment/l2")
+    public PatientBookingL1Response appointmentBookingL2(@RequestBody PatientBookingRequest patientBookingRequest){
+        return patientControllerImpl.appointmentBookingL2(patientBookingRequest);
+    }
+
 }
