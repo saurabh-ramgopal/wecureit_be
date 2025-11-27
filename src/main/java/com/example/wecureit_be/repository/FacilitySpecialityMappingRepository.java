@@ -2,7 +2,6 @@ package com.example.wecureit_be.repository;
 
 
 import com.example.wecureit_be.entity.FacilitySpecialityMapping;
-import com.example.wecureit_be.entity.FacilitySpecialityMappingId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface FacilitySpecialityMappingRepository extends JpaRepository<FacilitySpecialityMapping, FacilitySpecialityMappingId> {
+public interface FacilitySpecialityMappingRepository extends JpaRepository<FacilitySpecialityMapping, String> {
 
     @Transactional
     @Modifying
@@ -31,5 +30,10 @@ public interface FacilitySpecialityMappingRepository extends JpaRepository<Facil
     void insertIntoFacilitySpecialityMapping(@Param("facilityMasterId") String facilityMasterId,
                                              @Param("specialityMasterId") String specialityMasterId,
                                              @Param("facilitySpecialityMappingId") String facilitySpecialityMappingId);
+
+    @Query(value = "select * from facility_speciality_mapping " +
+            "where speciality_master_id = :specialityMasterId ", nativeQuery = true)
+    List<FacilitySpecialityMapping> getFacilityBySpecialityId(@Param("specialityMasterId") String specialityMasterId);
+
 
 }

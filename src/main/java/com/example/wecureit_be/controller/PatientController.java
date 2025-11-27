@@ -2,8 +2,10 @@ package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
+import com.example.wecureit_be.request.PatientBookingRequest;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
 import com.example.wecureit_be.request.PatientUpdateRequest;
+import com.example.wecureit_be.response.PatientBookingL1Response;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,11 @@ public class PatientController {
     @PostMapping(value="/registration")
     public PatientMaster newRegistration (@RequestBody PatientRegistrationRequest patientRegistrationRequest) {
         return patientControllerImpl.newRegistration(patientRegistrationRequest);
+    }
+
+    @PostMapping(value="/bookAppointment/l1")
+    public PatientBookingL1Response appointmentBookingL1(@RequestBody PatientBookingRequest patientBookingRequest){
+        return patientControllerImpl.appointmentBookingL1(patientBookingRequest);
     }
 
 }
