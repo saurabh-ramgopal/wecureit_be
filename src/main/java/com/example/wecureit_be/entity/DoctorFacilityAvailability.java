@@ -31,4 +31,7 @@ public class DoctorFacilityAvailability {
 
     @Column(name = "available_end_time")
     public LocalTime availableEndTime;
+
+    @Column(name = "is_active")
+    public Boolean isActive;
 }

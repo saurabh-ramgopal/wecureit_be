@@ -1,10 +1,7 @@
 package com.example.wecureit_be.impl;
 
 import com.example.wecureit_be.entity.*;
-import com.example.wecureit_be.repository.DoctorFacilityAvailabilityRepository;
-import com.example.wecureit_be.repository.DoctorSpecialityMappingRepository;
-import com.example.wecureit_be.repository.FacilitySpecialityMappingRepository;
-import com.example.wecureit_be.repository.PatientMasterRepository;
+import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.PatientBookingRequest;
 import com.example.wecureit_be.request.PatientRegistrationRequest;
 import com.example.wecureit_be.response.PatientBookingL1Response;
@@ -19,10 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.wecureit_be.request.PatientUpdateRequest;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,10 +29,7 @@ public class PatientControllerImpl {
     DoctorFacilityAvailabilityRepository doctorFacilityAvailabilityRepository;
 
     @Autowired
-    DoctorSpecialityMappingRepository doctorSpecialityMappingRepository;
-
-    @Autowired
-    FacilitySpecialityMappingRepository facilitySpecialityMappingRepository;
+    PractisingSpecialityRepository practisingSpecialityRepository;
 
 
     public PatientMaster addOrUpdate(PatientMaster patientMaster) {
@@ -134,13 +125,17 @@ public class PatientControllerImpl {
             }
 
             //fetch specs
-            List<DoctorSpecialityMapping> listOfSpeciality =
-                    doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(patientFilterRequest.getDoctorMasterId());
-
             List<SpecialityMaster> specialityMasterList = new ArrayList<>();
-            for(DoctorSpecialityMapping each: listOfSpeciality){
-                if(!specialityMasterList.contains(each.getSpecialityMaster())){
-                    specialityMasterList.add(each.getSpecialityMaster());
+
+            for(DoctorFacilityAvailability eachDocFacAvailability: doctorFacilityAvailabilities){
+                List<PractisingSpeciality> practisingSpecialityList =
+                        practisingSpecialityRepository.getSpecialitiesByDfaId(eachDocFacAvailability.getDfAvailabilityId());
+
+                for(PractisingSpeciality eachSpeciality: practisingSpecialityList){
+                    if(!specialityMasterList.contains(eachSpeciality.getSpecialityMaster())){
+                        specialityMasterList.add(eachSpeciality.getSpecialityMaster());
+                    }
+
                 }
             }
 
@@ -154,27 +149,23 @@ public class PatientControllerImpl {
                 ObjectUtils.isEmpty(patientFilterRequest.getFacilityMasterId())){
 
             //fetch docs
-            List<DoctorSpecialityMapping> listOfDocs =
-                    doctorSpecialityMappingRepository.getDoctorsBySpecialityId(patientFilterRequest.getSpecialityMasterId());
-
             List<DoctorMaster> doctorMasterList = new ArrayList<>();
-            for(DoctorSpecialityMapping each: listOfDocs){
-                if(!doctorMasterList.contains(each.getDoctorMaster())){
-                    doctorMasterList.add(each.getDoctorMaster());
+            List<FacilityMaster> facilityMasterList = new ArrayList<>();
+
+            List<PractisingSpeciality> allPractisingSpecialities =
+                    practisingSpecialityRepository.getDfaIdBySpecialty(patientFilterRequest.getSpecialityMasterId());
+
+            for(PractisingSpeciality each: allPractisingSpecialities){
+                if(!doctorMasterList.contains(each.getDoctorFacilityAvailability().getDoctorMaster())){
+                    doctorMasterList.add(each.getDoctorFacilityAvailability().getDoctorMaster());
+                }
+                if(!facilityMasterList.contains(each.getDoctorFacilityAvailability().getFacilityMaster())){
+                    facilityMasterList.add(each.getDoctorFacilityAvailability().getFacilityMaster());
                 }
             }
 
-            //fetch facilities
-            List<FacilitySpecialityMapping> listOfSpeciality =
-                    facilitySpecialityMappingRepository.getFacilityBySpecialityId(patientFilterRequest.getSpecialityMasterId());
-            List<FacilityMaster> facilities = new ArrayList<>();
-
-            for(FacilitySpecialityMapping facility: listOfSpeciality){
-                facilities.add(facility.getFacilityMaster());
-            }
-
             //res (doctor + facility)
-            return new PatientBookingL1Response(facilities, null, doctorMasterList);
+            return new PatientBookingL1Response(facilityMasterList, null, doctorMasterList);
         }
 
         //Filtering only by facilityId
@@ -194,16 +185,20 @@ public class PatientControllerImpl {
             }
 
             //fetch speciality
-            List<FacilitySpecialityMapping> listOfSpeciality =
-                    facilitySpecialityMappingRepository.getSpecialityByFacilityId(patientFilterRequest.getFacilityMasterId());
-            List<SpecialityMaster> specialities = new ArrayList<>();
+            List<SpecialityMaster> specialityMasterList = new ArrayList<>();
+            for(DoctorFacilityAvailability each: availableDocs){
+                List<PractisingSpeciality> listOfSpeciality =
+                        practisingSpecialityRepository.getSpecialitiesByDfaId(each.getDfAvailabilityId());
 
-            for(FacilitySpecialityMapping each: listOfSpeciality){
-                specialities.add(each.getSpecialityMaster());
+                for(PractisingSpeciality eachSpec: listOfSpeciality){
+                    if(!specialityMasterList.contains(eachSpec.getSpecialityMaster())){
+                        specialityMasterList.add(eachSpec.getSpecialityMaster());
+                    }
+                }
             }
 
             //res (doctor + speciality)
-            return new PatientBookingL1Response(null, specialities, doctorMasterList);
+            return new PatientBookingL1Response(null, specialityMasterList, doctorMasterList);
         }
 
         return null;

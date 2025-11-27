@@ -1,8 +1,6 @@
 package com.example.wecureit_be.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.wecureit_be.entity.*;
@@ -20,13 +18,12 @@ import com.example.wecureit_be.request.AddDoctorAvailabilityList;
 import com.example.wecureit_be.utilities.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import lombok.SneakyThrows;
-import java.util.HashMap;
 
 @Service
 public class DoctorControllerImpl {
 
     @Autowired
-    private final FacilityMasterRepository facilityMasterRepository;
+    FacilityMasterRepository facilityMasterRepository;
 
     @Autowired
     DoctorMasterRepository doctorMasterRepository;
@@ -40,9 +37,11 @@ public class DoctorControllerImpl {
     @Autowired
     DoctorFacilityAvailabilityRepository doctorFacilityAvailabilityRepository;
 
-    DoctorControllerImpl(FacilityMasterRepository facilityMasterRepository) {
-        this.facilityMasterRepository = facilityMasterRepository;
-    }
+    @Autowired
+    PractisingSpecialityRepository practisingSpecialityRepository;
+
+    @Autowired
+    FacilitySpecialityMappingRepository facilitySpecialityMappingRepository;
 
     public List<DoctorDetails> getAllDoctors(){
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
@@ -147,10 +146,10 @@ public class DoctorControllerImpl {
     }
 
     public AddDoctorAvailabilityResponse addAvailability(AddDoctorAvailabilityRequest request) {
+        DoctorMaster doctorMaster = doctorMasterRepository.getDoctorById(request.getDoctorId());
 
         for(AddDoctorAvailabilityList eachFacility : request.getFacilityList()){
             FacilityMaster facilityMaster = facilityMasterRepository.getFacilityById(eachFacility.getFacilityId());
-            DoctorMaster doctorMaster = doctorMasterRepository.getDoctorById(request.getDoctorId());
 
             DoctorFacilityAvailability doctorFacilityAvailability = new DoctorFacilityAvailability();
             doctorFacilityAvailability.setDfAvailabilityId(Utils.generateUUID());
@@ -159,7 +158,36 @@ public class DoctorControllerImpl {
             doctorFacilityAvailability.setAvailableDate(eachFacility.getAvailableDate());
             doctorFacilityAvailability.setAvailableStartTime(eachFacility.getAvailableStartTime());
             doctorFacilityAvailability.setAvailableEndTime(eachFacility.getAvailableEndTime());
+            doctorFacilityAvailability.setIsActive(true);
             doctorFacilityAvailabilityRepository.save(doctorFacilityAvailability);
+
+            List<SpecialityMaster> specialityMasterList;
+
+            List<DoctorSpecialityMapping> docSpecialities =
+                    doctorSpecialityMappingRepository.getSpecialityByDoctorIdAndStateCode
+                            (doctorMaster.getDoctorMasterId(), facilityMaster.getStateCode().getStateCode());
+
+            List<FacilitySpecialityMapping> facSpecialities =
+                    facilitySpecialityMappingRepository.getSpecialityByFacilityId
+                            (facilityMaster.getFacilityMasterId());
+
+            // Extract speciality IDs from facility list
+            Set<String> facilitySpecialityIds = facSpecialities.stream()
+                    .map(f -> f.getSpecialityMaster().getSpecialityMasterId())
+                    .collect(Collectors.toSet());
+
+            // Filter doctor specialities that match facility specialities
+            specialityMasterList = docSpecialities.stream()
+                    .map(DoctorSpecialityMapping::getSpecialityMaster)
+                    .filter(s -> facilitySpecialityIds.contains(s.getSpecialityMasterId()))
+                    .distinct()
+                    .collect(Collectors.toList());
+
+
+            for(SpecialityMaster each : specialityMasterList){
+                practisingSpecialityRepository.insertIntoPractisingSpeciality
+                        (doctorFacilityAvailability.getDfAvailabilityId(), each.getSpecialityMasterId());
+            }
         }
         return new AddDoctorAvailabilityResponse(request.getDoctorId(), request.getFacilityList());
     }

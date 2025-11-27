@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface DoctorFacilityAvailabilityRepository extends JpaRepository<DoctorFacilityAvailability, String> {
 
-    @Query(value = "SELECT * FROM doctor_facility_availability WHERE doctor_master_id = :doctorId", nativeQuery = true)
+    @Query(value = "SELECT * FROM doctor_facility_availability WHERE doctor_master_id = :doctorId and is_active = true ", nativeQuery = true)
     List<DoctorFacilityAvailability> getAvailableFacilityById(@Param("doctorId") Integer doctorId);
 
-    @Query(value = "SELECT * FROM doctor_facility_availability WHERE facility_master_id = :facilityMasterId", nativeQuery = true)
+    @Query(value = "SELECT * FROM doctor_facility_availability WHERE facility_master_id = :facilityMasterId and is_active = true", nativeQuery = true)
     List<DoctorFacilityAvailability> getAvailableDoctorsById(@Param("facilityMasterId") String facilityMasterId);
 
 }
