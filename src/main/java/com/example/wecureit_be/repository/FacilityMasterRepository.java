@@ -19,7 +19,6 @@ public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, 
     @Query(value = "SELECT * FROM facility_master where facility_master_id = :facilityMasterId", nativeQuery = true)
     FacilityMaster getFacilityById(@Param("facilityMasterId") String facilityMasterId);
 
-    // todo Ullas - facility table isActive filter
     @Query(
         value = """
             WITH doctor_state_specs AS (
