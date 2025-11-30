@@ -2,20 +2,23 @@ package com.example.wecureit_be.impl;
 
 import com.example.wecureit_be.entity.*;
 import com.example.wecureit_be.repository.*;
-import com.example.wecureit_be.request.PatientBookingRequest;
-import com.example.wecureit_be.request.PatientRegistrationRequest;
+import com.example.wecureit_be.request.*;
+import com.example.wecureit_be.response.BookAppointmentResponse;
+import com.example.wecureit_be.response.FetchDatesResponse;
 import com.example.wecureit_be.response.PatientBookingL1Response;
+import com.example.wecureit_be.response.TimeSlot;
 import com.example.wecureit_be.utilities.Utils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
-import com.example.wecureit_be.request.PatientUpdateRequest;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.time.LocalTime;
 import java.util.*;
 
 @Slf4j
@@ -30,6 +33,14 @@ public class PatientControllerImpl {
 
     @Autowired
     PractisingSpecialityRepository practisingSpecialityRepository;
+
+    @Autowired
+    AppointmentsRepository appointmentsRepository;
+
+    @Autowired
+    SpecialityMasterRepository specialityMasterRepository;
+
+    private static final int defaultSlotDuration = 15;
 
 
     public PatientMaster addOrUpdate(PatientMaster patientMaster) {
@@ -275,4 +286,123 @@ public class PatientControllerImpl {
 
         return null;
     }
+
+    public List<FetchDatesResponse> appointmentDates (PatientBookingRequest patientBookingRequest) {
+
+        List<DoctorFacilityAvailability> availableFacDocs =
+                doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecIdAndFacId
+                        (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId(),
+                                patientBookingRequest.getFacilityMasterId());
+
+        List<FetchDatesResponse> response = new ArrayList<>();
+
+        for(DoctorFacilityAvailability each : availableFacDocs){
+            response.add(new FetchDatesResponse(each.getDfAvailabilityId(), each.getAvailableDate(),
+                    each.getIsFilled()));
+        }
+        return response;
+    }
+
+    public List<TimeSlot> findSlots (GetSlotsRequest getSlotsRequest) {
+
+        DoctorFacilityAvailability doctorFacilityAvailability =
+                doctorFacilityAvailabilityRepository.getByDfAvailabilityId(getSlotsRequest.getDfAvailabilityId());
+
+        List<Appointments> docAppointments =
+                appointmentsRepository.getAppointmentByDocId(doctorFacilityAvailability.getDoctorMaster().getDoctorMasterId());
+
+        LocalTime currStartTime = doctorFacilityAvailability.getAvailableStartTime();
+        int durationReq = getSlotsRequest.getDuration();
+        List<TimeSlot> validSlots = new ArrayList<>();
+
+        while (currStartTime.plusMinutes(durationReq).isBefore(doctorFacilityAvailability.getAvailableEndTime()) ||
+                currStartTime.plusMinutes(durationReq).equals(doctorFacilityAvailability.getAvailableEndTime())) {
+
+            LocalTime proposedStart = currStartTime;
+            LocalTime proposedEnd = currStartTime.plusMinutes(durationReq);
+
+            if (isSlotFree(proposedStart, proposedEnd, docAppointments)) {
+                if (isLessThan60(proposedStart, proposedEnd, docAppointments, durationReq)) {
+                    validSlots.add(new TimeSlot(proposedStart, proposedEnd));
+                }
+            }
+            currStartTime = currStartTime.plusMinutes(defaultSlotDuration);
+        }
+
+        return validSlots;
+    }
+
+    private boolean isSlotFree(LocalTime start, LocalTime end, List<Appointments> appointments) {
+        for (Appointments eachAppointment : appointments) {
+
+            if (start.isBefore(eachAppointment.getEndTime())
+                    && end.isAfter(eachAppointment.getStartTime())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isLessThan60(LocalTime start, LocalTime end, List<Appointments> appointments, int durationReq) {
+
+        int workBefore = getContinuousWorkMinutes(start, appointments, false);
+        int workAfter = getContinuousWorkMinutes(end, appointments, true);
+        int totalContinuousWork = workBefore + durationReq + workAfter;
+
+        return totalContinuousWork <= 60;
+    }
+
+    private int getContinuousWorkMinutes(LocalTime startTime, List<Appointments> appointments, boolean lookForward) {
+        int totalTime = 0;
+        LocalTime currentSearchPoint = startTime;
+        boolean foundConnection = true;
+
+        while (foundConnection) {
+            foundConnection = false;
+
+            for (Appointments eachAppointment : appointments) {
+                if (lookForward) {
+                    if (eachAppointment.getStartTime().equals(currentSearchPoint)) {
+                        totalTime += eachAppointment.getDuration();
+                        currentSearchPoint = eachAppointment.getEndTime();
+                        foundConnection = true;
+                        break;
+                    }
+                }
+                else {
+                    if (eachAppointment.getEndTime().equals(currentSearchPoint)) {
+                        totalTime += eachAppointment.getDuration();
+                        currentSearchPoint = eachAppointment.getStartTime();
+                        foundConnection = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return totalTime;
+    }
+
+    public BookAppointmentResponse bookAppointment(BookAppointmentRequest bookAppointmentRequest) {
+        PatientMaster patientMaster =
+                patientMasterRepository.getPatientById(bookAppointmentRequest.getPatientMasterId());
+        SpecialityMaster specialityMaster =
+                specialityMasterRepository.getSpecialityById(bookAppointmentRequest.getSpecialityMasterId());
+        DoctorFacilityAvailability doctorFacilityAvailability =
+                doctorFacilityAvailabilityRepository.getByDfAvailabilityId(bookAppointmentRequest.getDfAvailabilityId());
+        BookAppointmentResponse response = new BookAppointmentResponse();
+
+        Appointments appointments = new Appointments();
+        appointments.setAppointmentId(Utils.generateFiveDigitNumber());
+        appointments.setDate(bookAppointmentRequest.getDate());
+        appointments.setDuration(bookAppointmentRequest.getDuration());
+        appointments.setPatientMaster(patientMaster);
+        appointments.setDoctorFacilityAvailability(doctorFacilityAvailability);
+        appointments.setStartTime(bookAppointmentRequest.getStartTime());
+        appointments.setEndTime(bookAppointmentRequest.getEndTime());
+        appointments.setSpecialityMaster(specialityMaster);
+        appointmentsRepository.save(appointments);
+        BeanUtils.copyProperties(appointments, response);
+        return response;
+    }
+
 }

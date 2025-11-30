@@ -1,6 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.impl.DoctorControllerImpl;
+import com.example.wecureit_be.request.AddAppointmentNoteRequest;
 import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
 import com.example.wecureit_be.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,16 @@ public class DoctorController {
     @GetMapping(value="facilities/getById")
     public List<FacilityDetails> getFacilitiesForDoctor(@RequestParam Integer doctorId) {
         return doctorControllerImpl.getFacilitiesForDoctor(doctorId);
+    }
+
+    @PostMapping(value="appointments/addNote")
+    public Boolean addAppointmentNote (@RequestBody AddAppointmentNoteRequest addAppointmentNoteRequest) {
+        return doctorControllerImpl.addAppointmentNote(addAppointmentNoteRequest);
+    }
+
+    @GetMapping(value="appointments/getAll")
+    public List<BookAppointmentResponse> getAllAppointments(@RequestParam Integer doctorId) {
+        return doctorControllerImpl.getAllAppointments(doctorId);
     }
 
 }

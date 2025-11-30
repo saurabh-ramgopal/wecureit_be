@@ -2,13 +2,17 @@ package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.entity.PatientMaster;
 import com.example.wecureit_be.impl.PatientControllerImpl;
-import com.example.wecureit_be.request.PatientBookingRequest;
-import com.example.wecureit_be.request.PatientRegistrationRequest;
-import com.example.wecureit_be.request.PatientUpdateRequest;
+import com.example.wecureit_be.request.*;
+import com.example.wecureit_be.response.BookAppointmentResponse;
+import com.example.wecureit_be.response.FetchDatesResponse;
 import com.example.wecureit_be.response.PatientBookingL1Response;
+import com.example.wecureit_be.response.TimeSlot;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/patient")
 public class PatientController {
@@ -40,14 +44,29 @@ public class PatientController {
         return patientControllerImpl.newRegistration(patientRegistrationRequest);
     }
 
-    @PostMapping(value="/bookAppointment/l1")
+    @PostMapping(value="/bookAppointment/fetchL1")
     public PatientBookingL1Response appointmentBookingL1(@RequestBody PatientBookingRequest patientBookingRequest){
         return patientControllerImpl.appointmentBookingL1(patientBookingRequest);
     }
 
-    @PostMapping(value="/bookAppointment/l2")
+    @PostMapping(value="/bookAppointment/fetchL2")
     public PatientBookingL1Response appointmentBookingL2(@RequestBody PatientBookingRequest patientBookingRequest){
         return patientControllerImpl.appointmentBookingL2(patientBookingRequest);
+    }
+
+    @PostMapping(value="/bookAppointment/fetchDates")
+    public List<FetchDatesResponse> appointmentDates (@RequestBody PatientBookingRequest patientBookingRequest){
+        return patientControllerImpl.appointmentDates(patientBookingRequest);
+    }
+
+    @PostMapping(value="/bookAppointment/fetchSlots")
+    public List<TimeSlot> findSlots (@RequestBody GetSlotsRequest getSlotsRequest){
+        return patientControllerImpl.findSlots(getSlotsRequest);
+    }
+
+    @PostMapping(value="/bookAppointment")
+    public BookAppointmentResponse bookAppointment (@RequestBody BookAppointmentRequest bookAppointmentRequest){
+        return patientControllerImpl.bookAppointment(bookAppointmentRequest);
     }
 
 }

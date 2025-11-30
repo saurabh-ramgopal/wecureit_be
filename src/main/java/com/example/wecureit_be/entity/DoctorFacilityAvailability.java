@@ -34,4 +34,7 @@ public class DoctorFacilityAvailability {
 
     @Column(name = "is_active")
     public Boolean isActive;
+
+    @Column(name = "is_filled")
+    public Boolean isFilled;
 }
