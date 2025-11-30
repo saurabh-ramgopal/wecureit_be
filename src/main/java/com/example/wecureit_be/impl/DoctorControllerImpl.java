@@ -236,12 +236,12 @@ public class DoctorControllerImpl {
         return true;
     }
 
-    public List<BookAppointmentResponse> getAllAppointments (Integer doctorId) {
+    public List<BookAppointmentResponse> getFutureAppointments (Integer doctorId) {
 
         List<BookAppointmentResponse> response = new ArrayList<>();
 
         List<Appointments> docAppointments =
-                appointmentsRepository.getAppointmentByDocId(doctorId);
+                appointmentsRepository.getAppointmentForNext2Weeks(doctorId);
 
         for(Appointments eachAppointment : docAppointments){
             BookAppointmentResponse bookAppointmentResponse = new BookAppointmentResponse();
@@ -249,5 +249,39 @@ public class DoctorControllerImpl {
             response.add(bookAppointmentResponse);
         }
         return response;
+    }
+
+    public List<BookAppointmentResponse> getPastAppointments(Integer doctorId) {
+        List<BookAppointmentResponse> response = new ArrayList<>();
+
+        List<Appointments> docAppointments =
+                appointmentsRepository.getPastAppointments(doctorId);
+
+        for(Appointments eachAppointment : docAppointments){
+            BookAppointmentResponse bookAppointmentResponse = new BookAppointmentResponse();
+            BeanUtils.copyProperties(eachAppointment, bookAppointmentResponse);
+            response.add(bookAppointmentResponse);
+        }
+        return response;
+    }
+
+    public AddDoctorAvailabilityResponse getSummary(Integer doctorId) {
+
+        List<DoctorFacilityAvailability> list =
+                doctorFacilityAvailabilityRepository.getFutureAvailabilityByDocId(doctorId);
+
+        List<AddDoctorAvailabilityList> resFacilityList = new ArrayList<>();
+
+        for(DoctorFacilityAvailability eachAvailability : list){
+            AddDoctorAvailabilityList docAvailability = new AddDoctorAvailabilityList();
+
+            docAvailability.setFacilityId(eachAvailability.getFacilityMaster().getFacilityMasterId());
+            docAvailability.setAvailableDate(eachAvailability.getAvailableDate());
+            docAvailability.setAvailableStartTime(eachAvailability.getAvailableStartTime());
+            docAvailability.setAvailableEndTime(eachAvailability.getAvailableEndTime());
+            resFacilityList.add(docAvailability);
+        }
+
+        return new AddDoctorAvailabilityResponse(doctorId, resFacilityList);
     }
 }

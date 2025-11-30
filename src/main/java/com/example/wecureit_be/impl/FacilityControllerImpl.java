@@ -72,6 +72,11 @@ public class FacilityControllerImpl {
         else{
             facilityMaster = facilityMasterRepository.getFacilityById(addOrUpdateFacilityRequest.getFacilityMasterId());
             facilityMaster.setNoOfRooms(addOrUpdateFacilityRequest.getNoOfRooms());
+
+            if(!ObjectUtils.isEmpty(addOrUpdateFacilityRequest.getFacilityName()))
+                facilityMaster.setFacilityName(addOrUpdateFacilityRequest.getFacilityName());
+            if(!ObjectUtils.isEmpty(addOrUpdateFacilityRequest.getFacilityStreet()))
+                facilityMaster.setFacilityStreet(addOrUpdateFacilityRequest.getFacilityStreet());
         }
 
         int rows = facilitySpecialityMappingRepository.deleteFacilityAllSpeciality(facilityMaster.getFacilityMasterId());

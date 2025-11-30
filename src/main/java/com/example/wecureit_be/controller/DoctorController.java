@@ -26,6 +26,11 @@ public class DoctorController {
         return doctorControllerImpl.addAvailability(addDoctorAvailabilityRequest);
     }
 
+    @GetMapping(value = "/availability/getSummary")
+    public AddDoctorAvailabilityResponse getSummary(@RequestParam Integer doctorId) {
+        return doctorControllerImpl.getSummary(doctorId);
+    }
+
     @GetMapping(value="facilities/getById")
     public List<FacilityDetails> getFacilitiesForDoctor(@RequestParam Integer doctorId) {
         return doctorControllerImpl.getFacilitiesForDoctor(doctorId);
@@ -36,9 +41,14 @@ public class DoctorController {
         return doctorControllerImpl.addAppointmentNote(addAppointmentNoteRequest);
     }
 
-    @GetMapping(value="appointments/getAll")
-    public List<BookAppointmentResponse> getAllAppointments(@RequestParam Integer doctorId) {
-        return doctorControllerImpl.getAllAppointments(doctorId);
+    @GetMapping(value="appointments/getNextTwoWeeks")
+    public List<BookAppointmentResponse> getFutureAppointments(@RequestParam Integer doctorId) {
+        return doctorControllerImpl.getFutureAppointments(doctorId);
+    }
+
+    @GetMapping(value="appointments/getAllPast")
+    public List<BookAppointmentResponse> getPastAppointments(@RequestParam Integer doctorId) {
+        return doctorControllerImpl.getPastAppointments(doctorId);
     }
 
 }

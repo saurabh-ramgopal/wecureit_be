@@ -28,5 +28,21 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
     void updateAppointmentNote(@Param("appointmentId") Integer appointmentId,
                                @Param("appointmentNote") String appointmentNote);
 
+    @Query(value = "SELECT a.* FROM appointments a " +
+            "LEFT JOIN doctor_facility_availability dfa " +
+            "ON dfa.df_availability_id = a.df_availability_id " +
+            "WHERE dfa.doctor_master_id = :doctorMasterId " +
+            "AND (a.date + a.start_time) >= NOW() " +
+            "ORDER BY a.start_time ASC ", nativeQuery = true)
+    List<Appointments> getAppointmentForNext2Weeks (@Param("doctorMasterId") Integer doctorMasterId);
+
+    @Query(value = "SELECT a.* FROM appointments a " +
+            "LEFT JOIN doctor_facility_availability dfa " +
+            "ON dfa.df_availability_id = a.df_availability_id " +
+            "WHERE dfa.doctor_master_id = :doctorMasterId " +
+            "AND (a.date + a.end_time) <= NOW() " +
+            "ORDER BY a.start_time ASC ", nativeQuery = true)
+    List<Appointments> getPastAppointments (@Param("doctorMasterId") Integer doctorMasterId);
+
 
 }
