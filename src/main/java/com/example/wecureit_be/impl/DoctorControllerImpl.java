@@ -4,17 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.wecureit_be.entity.*;
+import com.example.wecureit_be.request.*;
 import com.example.wecureit_be.response.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.wecureit_be.repository.*;
-import com.example.wecureit_be.request.AddDoctorRequest;
-import com.example.wecureit_be.request.DeleteDoctorRequest;
-import com.example.wecureit_be.request.DoctorStateSpeciality;
-import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
-import com.example.wecureit_be.request.AddDoctorAvailabilityList;
 import com.example.wecureit_be.utilities.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import lombok.SneakyThrows;
@@ -42,6 +38,9 @@ public class DoctorControllerImpl {
 
     @Autowired
     FacilitySpecialityMappingRepository facilitySpecialityMappingRepository;
+
+    @Autowired
+    AppointmentsRepository appointmentsRepository;
 
     public List<DoctorDetails> getAllDoctors(){
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
@@ -230,4 +229,25 @@ public class DoctorControllerImpl {
         return responseList;
     }
 
+    public Boolean addAppointmentNote(AddAppointmentNoteRequest addAppointmentNoteRequest) {
+        appointmentsRepository.updateAppointmentNote
+                (addAppointmentNoteRequest.getAppointmentId(), addAppointmentNoteRequest.getAppointmentNote());
+
+        return true;
+    }
+
+    public List<BookAppointmentResponse> getAllAppointments (Integer doctorId) {
+
+        List<BookAppointmentResponse> response = new ArrayList<>();
+
+        List<Appointments> docAppointments =
+                appointmentsRepository.getAppointmentByDocId(doctorId);
+
+        for(Appointments eachAppointment : docAppointments){
+            BookAppointmentResponse bookAppointmentResponse = new BookAppointmentResponse();
+            BeanUtils.copyProperties(eachAppointment, bookAppointmentResponse);
+            response.add(bookAppointmentResponse);
+        }
+        return response;
+    }
 }
