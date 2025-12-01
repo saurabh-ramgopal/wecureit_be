@@ -37,24 +37,25 @@ public class CardService {
             }
         }
 
-    // Encrypt PAN and CVC using same DEK but unique IV per field
-    var multi = encryptService.encryptMultiple(req.getPan(), req.getCvc());
-    String[] encryptedVals = multi.encryptedValues();
-    String[] ivs = multi.ivs();
+        // Prepare expiry as MM/YYYY string and encrypt PAN, CVC and expiry together
+        String expiry = String.format("%02d/%04d", req.getExpMonth(), req.getExpYear());
+        var multi = encryptService.encryptMultiple(req.getPan(), req.getCvc(), expiry);
+        String[] encryptedVals = multi.encryptedValues();
+        String[] ivs = multi.ivs();
 
-    Card card = new Card();
-    // ensure new card is active by default
-    card.setIsActive(true);
-    card.setEncryptedPan(encryptedVals.length > 0 ? encryptedVals[0] : null);
-    card.setEncryptedCvc(encryptedVals.length > 1 ? encryptedVals[1] : null);
-    card.setWrappedDek(multi.wrappedDek());
-    // store IVs per-field
-    card.setIv(ivs.length > 0 ? ivs[0] : null);
-    card.setCvcIv(ivs.length > 1 ? ivs[1] : null);
+        Card card = new Card();
+        // ensure new card is active by default
+        card.setIsActive(true);
+        card.setEncryptedPan(encryptedVals.length > 0 ? encryptedVals[0] : null);
+        card.setEncryptedCvc(encryptedVals.length > 1 ? encryptedVals[1] : null);
+        card.setWrappedDek(multi.wrappedDek());
+        // store IVs per-field
+        card.setIv(ivs.length > 0 ? ivs[0] : null);
+        card.setCvcIv(ivs.length > 1 ? ivs[1] : null);
         card.setLast4(req.getPan().substring(req.getPan().length() - 4));
-        // card.setBrand(req.getBrand()); --- IGNORE ---
-        card.setExpMonth(req.getExpMonth());
-        card.setExpYear(req.getExpYear());
+        // store encrypted expiry value and its IV
+        card.setEncryptedExpiry(encryptedVals.length > 2 ? encryptedVals[2] : null);
+        card.setExpiryIv(ivs.length > 2 ? ivs[2] : null);
         card.setPatientMaster(pm);
         return repo.save(card);
     }

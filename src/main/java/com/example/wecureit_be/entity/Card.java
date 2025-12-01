@@ -28,8 +28,11 @@ public class Card {
     private String cvcIv;
 
     private String last4;
-    private int expMonth;
-    private int expYear;
+    @Column(columnDefinition = "TEXT")
+    private String encryptedExpiry;
+
+    @Column(columnDefinition = "TEXT")
+    private String expiryIv;
 
     @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
     private Boolean isActive = true;
