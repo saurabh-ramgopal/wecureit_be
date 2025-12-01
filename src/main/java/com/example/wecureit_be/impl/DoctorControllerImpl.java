@@ -286,6 +286,7 @@ public class DoctorControllerImpl {
 
             docAvailability.setFacilityId(eachAvailability.getFacilityMaster().getFacilityMasterId());
             docAvailability.setFacilityName(eachAvailability.getFacilityMaster().getFacilityName());
+            docAvailability.setFacilityStreet(eachAvailability.getFacilityMaster().getFacilityStreet());
             docAvailability.setSpeciality(specialityMasterList);
             docAvailability.setStateName(eachAvailability.getFacilityMaster().getStateCode().getStateName());
             docAvailability.setStateCode(eachAvailability.getFacilityMaster().getStateCode().getStateCode());

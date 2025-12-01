@@ -12,6 +12,7 @@ import java.util.List;
 public class AddDoctorAvailabilityList {
     String facilityId;
     String facilityName;
+    String facilityStreet;
     LocalDate availableDate;
     LocalTime availableStartTime;
     LocalTime availableEndTime;
