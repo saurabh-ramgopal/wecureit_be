@@ -46,9 +46,11 @@ public class DoctorControllerImpl {
         List<DoctorMaster> doctorMasterList = doctorMasterRepository.findAll();
         List<DoctorDetails> listOfDoctorDetails = new ArrayList<>();
         for(DoctorMaster doctorMaster:doctorMasterList){
-            List<DoctorSpecialityMapping> listOfSpeciality =
-                    doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorMaster.getDoctorMasterId());
-            listOfDoctorDetails.add(prepareDocResponse(doctorMaster, listOfSpeciality));
+            if(doctorMaster.getIsActive()){
+                List<DoctorSpecialityMapping> listOfSpeciality =
+                        doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorMaster.getDoctorMasterId());
+                listOfDoctorDetails.add(prepareDocResponse(doctorMaster, listOfSpeciality));
+            }
         }
         return listOfDoctorDetails;
     }

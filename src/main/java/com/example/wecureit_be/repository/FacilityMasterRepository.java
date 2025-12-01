@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, String> {
 
-    @Query(value = "SELECT * FROM facility_master", nativeQuery = true)
+    @Query(value = "SELECT * FROM facility_master where is_active = true ", nativeQuery = true)
     List<FacilityMaster> getAllFacility();
 
     @Query(value = "SELECT * FROM facility_master where facility_master_id = :facilityMasterId", nativeQuery = true)
