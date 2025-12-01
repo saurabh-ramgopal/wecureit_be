@@ -276,6 +276,7 @@ public class DoctorControllerImpl {
             AddDoctorAvailabilityList docAvailability = new AddDoctorAvailabilityList();
 
             docAvailability.setFacilityId(eachAvailability.getFacilityMaster().getFacilityMasterId());
+            docAvailability.setFacilityName(eachAvailability.getFacilityMaster().getFacilityName());
             docAvailability.setAvailableDate(eachAvailability.getAvailableDate());
             docAvailability.setAvailableStartTime(eachAvailability.getAvailableStartTime());
             docAvailability.setAvailableEndTime(eachAvailability.getAvailableEndTime());

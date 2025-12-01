@@ -8,6 +8,7 @@ import java.time.LocalTime;
 @Data
 public class AddDoctorAvailabilityList {
     String facilityId;
+    String facilityName;
     LocalDate availableDate;
     LocalTime availableStartTime;
     LocalTime availableEndTime;
