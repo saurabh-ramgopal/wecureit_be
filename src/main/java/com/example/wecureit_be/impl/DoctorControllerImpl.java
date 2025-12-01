@@ -271,12 +271,24 @@ public class DoctorControllerImpl {
                 doctorFacilityAvailabilityRepository.getFutureAvailabilityByDocId(doctorId);
 
         List<AddDoctorAvailabilityList> resFacilityList = new ArrayList<>();
+        List<SpecialityMaster> specialityMasterList = new ArrayList<>();
 
         for(DoctorFacilityAvailability eachAvailability : list){
+
+            List<PractisingSpeciality> practisingSpeciality =
+                    practisingSpecialityRepository.getSpecialitiesByDfaId(eachAvailability.getDfAvailabilityId());
+
+            for(PractisingSpeciality each: practisingSpeciality){
+                if(!specialityMasterList.contains(each.getSpecialityMaster()))
+                    specialityMasterList.add(each.getSpecialityMaster());
+            }
             AddDoctorAvailabilityList docAvailability = new AddDoctorAvailabilityList();
 
             docAvailability.setFacilityId(eachAvailability.getFacilityMaster().getFacilityMasterId());
             docAvailability.setFacilityName(eachAvailability.getFacilityMaster().getFacilityName());
+            docAvailability.setSpeciality(specialityMasterList);
+            docAvailability.setStateName(eachAvailability.getFacilityMaster().getStateCode().getStateName());
+            docAvailability.setStateCode(eachAvailability.getFacilityMaster().getStateCode().getStateCode());
             docAvailability.setAvailableDate(eachAvailability.getAvailableDate());
             docAvailability.setAvailableStartTime(eachAvailability.getAvailableStartTime());
             docAvailability.setAvailableEndTime(eachAvailability.getAvailableEndTime());
