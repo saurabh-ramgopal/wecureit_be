@@ -402,6 +402,21 @@ public class PatientControllerImpl {
         appointments.setSpecialityMaster(specialityMaster);
         appointmentsRepository.save(appointments);
         BeanUtils.copyProperties(appointments, response);
+
+        // disable all the other facilities of the same day
+        List<DoctorFacilityAvailability> allDfAvailabilitiesForDay =
+                doctorFacilityAvailabilityRepository.getAllDfAvailabilitiesForDay(
+                        doctorFacilityAvailability.getDoctorMaster().getDoctorMasterId(), doctorFacilityAvailability.getAvailableDate());
+
+        if(allDfAvailabilitiesForDay.size()>1){
+            allDfAvailabilitiesForDay.remove(doctorFacilityAvailability);
+            for(DoctorFacilityAvailability eachFac : allDfAvailabilitiesForDay){
+                if(eachFac.getIsActive()){
+                    eachFac.setIsActive(false);
+                    doctorFacilityAvailabilityRepository.save(eachFac);
+                }
+            }
+        }
         return response;
     }
 
