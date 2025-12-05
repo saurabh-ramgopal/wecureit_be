@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -54,9 +53,5 @@ public interface DoctorFacilityAvailabilityRepository extends JpaRepository<Doct
             "and dfa.available_date >= CURRENT_DATE " +
             "ORDER BY dfa.available_date ASC ", nativeQuery = true)
     List<DoctorFacilityAvailability> getFutureAvailabilityByDocId (@Param("doctorMasterId") Integer doctorMasterId);
-
-    @Query(value = "SELECT * FROM doctor_facility_availability WHERE doctor_master_id = :doctorId and available_date = :date ", nativeQuery = true)
-    List<DoctorFacilityAvailability> getAllDfAvailabilitiesForDay(@Param("doctorId") Integer doctorId,
-                                                                  @Param("date") LocalDate date);
 
 }
