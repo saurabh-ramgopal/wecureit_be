@@ -5,6 +5,7 @@ import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.*;
 import com.example.wecureit_be.response.BookAppointmentResponse;
 import com.example.wecureit_be.response.FetchDatesResponse;
+import com.example.wecureit_be.response.PatientAppointments;
 import com.example.wecureit_be.response.PatientBookingL1Response;
 import com.example.wecureit_be.response.TimeSlot;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/patient")
@@ -67,6 +69,18 @@ public class PatientController {
     @PostMapping(value="/bookAppointment")
     public BookAppointmentResponse bookAppointment (@RequestBody BookAppointmentRequest bookAppointmentRequest){
         return patientControllerImpl.bookAppointment(bookAppointmentRequest);
+    }
+
+    // Upcoming appointments for a patient
+    @GetMapping(value="/upcomingAppointments")
+    public List<PatientAppointments> getUpcomingAppointments(@RequestParam Integer patientId) {
+        return patientControllerImpl.getUpcomingAppointments(patientId);
+    }
+    
+    // Old Appointments for a patient
+    @GetMapping(value="/oldAppointments")
+    public List<PatientAppointments> getOldAppointments(@RequestParam Integer patientId) {
+        return patientControllerImpl.getOldAppointments(patientId);
     }
 
 }
