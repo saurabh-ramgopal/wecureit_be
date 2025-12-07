@@ -1,10 +1,7 @@
 package com.example.wecureit_be.impl;
 
 import com.example.wecureit_be.entity.*;
-import com.example.wecureit_be.repository.FacilityMasterRepository;
-import com.example.wecureit_be.repository.FacilitySpecialityMappingRepository;
-import com.example.wecureit_be.repository.SpecialityMasterRepository;
-import com.example.wecureit_be.repository.StateMasterRepository;
+import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.AddOrUpdateFacilityRequest;
 import com.example.wecureit_be.request.DeleteFacilityRequest;
 import com.example.wecureit_be.response.FacilityDetails;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +31,11 @@ public class FacilityControllerImpl {
     @Autowired
     StateMasterRepository stateMasterRepository;
 
+    @Autowired
+    AppointmentsRepository appointmentsRepository;
+
 
     public List<FacilityDetails> getAllFacility(){
-
         List<FacilityDetails> response = new ArrayList<>();
         List<FacilityMaster> listOfFacilityMaster = facilityMasterRepository.getAllFacility();
 
@@ -48,6 +48,15 @@ public class FacilityControllerImpl {
             facilityDetail.setSpeciality(specialityMaster);
             facilityDetail.setStateCode(eachFacility.getStateCode().getStateCode());
             facilityDetail.setStateName(eachFacility.getStateCode().getStateName());
+
+            List<Appointments> anyFutureAppointments =
+                    appointmentsRepository.getAnyFutureAppointmentsByFacility(
+                            eachFacility.getFacilityMasterId(), LocalDate.now());
+
+            boolean isDeletable = anyFutureAppointments.isEmpty();
+
+            facilityDetail.setIsDeletable(isDeletable);
+
             response.add(facilityDetail);
         }
         return response;
