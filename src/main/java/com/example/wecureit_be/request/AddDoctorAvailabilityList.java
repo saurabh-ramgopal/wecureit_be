@@ -19,4 +19,5 @@ public class AddDoctorAvailabilityList {
     List<SpecialityMaster> speciality;
     String stateName;
     String stateCode;
+    boolean isEditable;
 }

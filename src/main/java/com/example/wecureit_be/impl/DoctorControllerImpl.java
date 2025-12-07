@@ -288,6 +288,11 @@ public class DoctorControllerImpl {
             List<PractisingSpeciality> practisingSpeciality =
                     practisingSpecialityRepository.getSpecialitiesByDfaId(eachAvailability.getDfAvailabilityId());
 
+            List<Appointments> appointmentsByDfAvailability = appointmentsRepository.
+                    getAppointmentsByDfAvailabilityId(eachAvailability.getDfAvailabilityId());
+
+            boolean isEditable = appointmentsByDfAvailability.isEmpty();
+
             for(PractisingSpeciality each: practisingSpeciality){
                 if(!specialityMasterList.contains(each.getSpecialityMaster()))
                     specialityMasterList.add(each.getSpecialityMaster());
@@ -303,9 +308,35 @@ public class DoctorControllerImpl {
             docAvailability.setAvailableDate(eachAvailability.getAvailableDate());
             docAvailability.setAvailableStartTime(eachAvailability.getAvailableStartTime());
             docAvailability.setAvailableEndTime(eachAvailability.getAvailableEndTime());
+            docAvailability.setEditable(isEditable);
             resFacilityList.add(docAvailability);
         }
 
         return new AddDoctorAvailabilityResponse(doctorId, resFacilityList);
+    }
+
+    public EditDoctorAvailabilityResponse editAvailability (EditDoctorAvailabilityRequest editDoctorAvailabilityRequest) {
+
+        DoctorFacilityAvailability doctorFacilityAvailability = doctorFacilityAvailabilityRepository
+                .getByDfAvailabilityId(editDoctorAvailabilityRequest.getDfAvailabilityId());
+
+        doctorFacilityAvailability.setAvailableStartTime(editDoctorAvailabilityRequest.getAvailableStartTime());
+        doctorFacilityAvailability.setAvailableEndTime(editDoctorAvailabilityRequest.getAvailableEndTime());
+        doctorFacilityAvailabilityRepository.save(doctorFacilityAvailability);
+
+        return new EditDoctorAvailabilityResponse(editDoctorAvailabilityRequest.getDfAvailabilityId(),
+                doctorFacilityAvailability.getAvailableStartTime(), doctorFacilityAvailability.getAvailableEndTime());
+    }
+
+    public DeleteDoctorAvailabilityResponse deleteAvailability(DeleteDoctorAvailabilityRequest deleteDoctorAvailabilityRequest) {
+
+        DoctorFacilityAvailability doctorFacilityAvailability = doctorFacilityAvailabilityRepository
+                .getByDfAvailabilityId(deleteDoctorAvailabilityRequest.getDfAvailabilityId());
+
+        doctorFacilityAvailability.setIsActive(false);
+        doctorFacilityAvailabilityRepository.save(doctorFacilityAvailability);
+
+        return new DeleteDoctorAvailabilityResponse(doctorFacilityAvailability.getDfAvailabilityId(),
+                doctorFacilityAvailability.getIsActive());
     }
 }
