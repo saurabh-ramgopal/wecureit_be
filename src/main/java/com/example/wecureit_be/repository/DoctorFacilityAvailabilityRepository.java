@@ -52,6 +52,7 @@ public interface DoctorFacilityAvailabilityRepository extends JpaRepository<Doct
     @Query(value = "select * from doctor_facility_availability dfa " +
             "where dfa.doctor_master_id = :doctorMasterId " +
             "and dfa.available_date >= CURRENT_DATE " +
+            "and dfa.is_active = true " +
             "ORDER BY dfa.available_date ASC ", nativeQuery = true)
     List<DoctorFacilityAvailability> getFutureAvailabilityByDocId (@Param("doctorMasterId") Integer doctorMasterId);
 
