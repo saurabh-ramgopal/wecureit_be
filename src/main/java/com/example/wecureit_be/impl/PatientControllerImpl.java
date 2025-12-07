@@ -323,10 +323,10 @@ public class PatientControllerImpl {
             LocalTime proposedStart = currStartTime;
             LocalTime proposedEnd = currStartTime.plusMinutes(durationReq);
 
-            if (isSlotFree(proposedStart, proposedEnd, docAppointments)) {
-                if (isLessThan60(proposedStart, proposedEnd, docAppointments, durationReq)) {
-                    validSlots.add(new TimeSlot(proposedStart, proposedEnd));
-                }
+            if (isSlotFree(proposedStart, proposedEnd, docAppointments)
+                    && isLessThan60(proposedStart, proposedEnd, docAppointments, durationReq)
+                        && checkFourHourWindow(proposedStart, proposedEnd, docAppointments)) {
+                validSlots.add(new TimeSlot(proposedStart, proposedEnd));
             }
             currStartTime = currStartTime.plusMinutes(defaultSlotDuration);
         }
@@ -382,6 +382,37 @@ public class PatientControllerImpl {
             }
         }
         return totalTime;
+    }
+
+    private boolean checkFourHourWindow(LocalTime proposedStart, LocalTime proposedEnd, List<Appointments> appointments) {
+
+        if (appointments == null || appointments.isEmpty()) {
+            return true;
+        }
+
+        LocalTime earliestStart = null;
+        LocalTime latestEnd = null;
+
+        for (Appointments appointment : appointments) {
+            LocalTime startTime = appointment.getStartTime();
+            if (earliestStart == null || startTime.isBefore(earliestStart)) {
+                earliestStart = startTime;
+            }
+        }
+
+        for (Appointments appointment : appointments) {
+            LocalTime endTime = appointment.getEndTime();
+            if (latestEnd == null || endTime.isAfter(latestEnd)) {
+                latestEnd = endTime;
+            }
+        }
+
+        LocalTime allowedStart = latestEnd.minusHours(4);
+        LocalTime allowedEnd = earliestStart.plusHours(4);
+
+        boolean isAllowed = !proposedStart.isBefore(allowedStart) && !proposedEnd.isAfter(allowedEnd);
+
+        return isAllowed;
     }
 
     public BookAppointmentResponse bookAppointment(BookAppointmentRequest bookAppointmentRequest) {
