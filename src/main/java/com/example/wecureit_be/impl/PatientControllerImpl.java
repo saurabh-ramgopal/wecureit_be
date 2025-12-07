@@ -431,7 +431,7 @@ public class PatientControllerImpl {
         List<PatientAppointments> response = new ArrayList<>();
         for(Appointments eachAppointment : appointmentsList){
             PatientAppointments appointment = new PatientAppointments();
-            appointment.setDoctorName(eachAppointment.getDoctorMaster().getDoctorName());
+            appointment.setDoctorName(eachAppointment.getDoctorFacilityAvailability().getDoctorMaster().getDoctorName());
             appointment.setSpeciality(eachAppointment.getSpecialityMaster().getSpecialityName());
             appointment.setAppointmentDate(eachAppointment.getDate());
             appointment.setStartTime(eachAppointment.getStartTime());
@@ -452,7 +452,7 @@ public class PatientControllerImpl {
         List<PatientAppointments> response = new ArrayList<>();
         for(Appointments eachAppointment : appointmentsList){
             PatientAppointments appointment = new PatientAppointments();
-            appointment.setDoctorName(eachAppointment.getDoctorMaster().getDoctorName());
+            appointment.setDoctorName(eachAppointment.getDoctorFacilityAvailability().getDoctorMaster().getDoctorName());
             appointment.setSpeciality(eachAppointment.getSpecialityMaster().getSpecialityName());
             appointment.setAppointmentDate(eachAppointment.getDate());
             appointment.setStartTime(eachAppointment.getStartTime());
