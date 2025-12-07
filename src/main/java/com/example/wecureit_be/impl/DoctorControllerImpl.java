@@ -1,5 +1,6 @@
 package com.example.wecureit_be.impl;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,7 +50,14 @@ public class DoctorControllerImpl {
             if(doctorMaster.getIsActive()){
                 List<DoctorSpecialityMapping> listOfSpeciality =
                         doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorMaster.getDoctorMasterId());
-                listOfDoctorDetails.add(prepareDocResponse(doctorMaster, listOfSpeciality));
+
+                List<Appointments> anyFutureAppointments =
+                        appointmentsRepository.getAnyFutureAppointmentsByDoctor(
+                                doctorMaster.getDoctorMasterId(), LocalDate.now());
+
+                boolean isDeletable = anyFutureAppointments.isEmpty();
+
+                listOfDoctorDetails.add(prepareDocResponse(doctorMaster, listOfSpeciality, isDeletable));
             }
         }
         return listOfDoctorDetails;
@@ -93,7 +101,7 @@ public class DoctorControllerImpl {
         List<DoctorSpecialityMapping> listOfSpeciality =
                 doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorId);
 
-        return prepareDocResponse(doctorMaster, listOfSpeciality);
+        return prepareDocResponse(doctorMaster, listOfSpeciality, null);
     }
 
     public DoctorMaster deleteDoctor(DeleteDoctorRequest deleteDoctorRequest){
@@ -107,11 +115,11 @@ public class DoctorControllerImpl {
 
         List<DoctorSpecialityMapping> listOfSpeciality =
                 doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorId);
-        return prepareDocResponse(doctorMaster, listOfSpeciality);
+        return prepareDocResponse(doctorMaster, listOfSpeciality, null);
     }
 
 
-    public DoctorDetails prepareDocResponse (DoctorMaster doctorMaster, List<DoctorSpecialityMapping> list){
+    public DoctorDetails prepareDocResponse (DoctorMaster doctorMaster, List<DoctorSpecialityMapping> list, Boolean isDeletable){
 
         List<DoctorStateDetails> doctorStateSpecialityList = new ArrayList<>();
 
@@ -139,7 +147,7 @@ public class DoctorControllerImpl {
 
         return new DoctorDetails(doctorMaster.getDoctorMasterId(),
                 doctorMaster.getDoctorName(), doctorMaster.getDoctorEmail(),
-                doctorMaster.getDoctorGender(), doctorMaster.getIsActive(), doctorStateSpecialityList);
+                doctorMaster.getDoctorGender(), doctorMaster.getIsActive(), isDeletable, doctorStateSpecialityList);
     }
 
     public DoctorMaster getByEmail(String doctorEmail) {

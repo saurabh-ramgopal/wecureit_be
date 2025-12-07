@@ -14,5 +14,6 @@ public class FacilityDetails {
     public String stateCode;
     public String stateName;
     public Boolean isActive;
+    public Boolean isDeletable;
     public List<SpecialityMaster> speciality;
 }

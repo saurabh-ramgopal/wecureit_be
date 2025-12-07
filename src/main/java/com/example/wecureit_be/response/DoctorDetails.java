@@ -11,5 +11,6 @@ public class DoctorDetails {
     public String doctorEmail;
     public String doctorGender;
     public Boolean isActive;
+    public Boolean isDeletable;
     public List<DoctorStateDetails> stateDetails;
 }

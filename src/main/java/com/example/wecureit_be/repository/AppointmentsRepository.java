@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -43,6 +44,22 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "AND (a.date + a.end_time) <= NOW() " +
             "ORDER BY a.start_time ASC ", nativeQuery = true)
     List<Appointments> getPastAppointments (@Param("doctorMasterId") Integer doctorMasterId);
+
+    @Query(value = "select a.* from appointments a " +
+            "left join doctor_facility_availability dfa " +
+            "on dfa.df_availability_id = a.df_availability_id " +
+            "where dfa.doctor_master_id = :doctorMasterId " +
+            "and a.date > :date ", nativeQuery = true)
+    List<Appointments> getAnyFutureAppointmentsByDoctor (@Param("doctorMasterId") Integer doctorMasterId,
+                                                         @Param("date")LocalDate date);
+
+    @Query(value = "select a.* from appointments a " +
+            "left join doctor_facility_availability dfa " +
+            "on dfa.df_availability_id = a.df_availability_id " +
+            "where dfa.facility_master_id = :facilityMasterId " +
+            "and a.date > :date ", nativeQuery = true)
+    List<Appointments> getAnyFutureAppointmentsByFacility (@Param("facilityMasterId") String facilityMasterId,
+                                                           @Param("date")LocalDate date);
 
 
 }
