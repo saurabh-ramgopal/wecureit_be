@@ -20,4 +20,5 @@ public class AddDoctorAvailabilityList {
     String stateName;
     String stateCode;
     boolean isEditable;
+    String dfAvailabilityId;
 }

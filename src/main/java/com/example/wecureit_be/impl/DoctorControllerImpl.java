@@ -299,6 +299,7 @@ public class DoctorControllerImpl {
             }
             AddDoctorAvailabilityList docAvailability = new AddDoctorAvailabilityList();
 
+            docAvailability.setDfAvailabilityId(eachAvailability.getDfAvailabilityId());
             docAvailability.setFacilityId(eachAvailability.getFacilityMaster().getFacilityMasterId());
             docAvailability.setFacilityName(eachAvailability.getFacilityMaster().getFacilityName());
             docAvailability.setFacilityStreet(eachAvailability.getFacilityMaster().getFacilityStreet());
