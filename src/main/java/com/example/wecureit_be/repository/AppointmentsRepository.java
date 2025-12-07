@@ -61,5 +61,9 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
     List<Appointments> getAnyFutureAppointmentsByFacility (@Param("facilityMasterId") String facilityMasterId,
                                                            @Param("date")LocalDate date);
 
+    @Query(value = "select * from appointments a " +
+            "where a.df_availability_id = :dfAvailabilityId ", nativeQuery = true)
+    List<Appointments> getAppointmentsByDfAvailabilityId (@Param("dfAvailabilityId") String dfAvailabilityId);
+
 
 }

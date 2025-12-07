@@ -3,6 +3,8 @@ package com.example.wecureit_be.controller;
 import com.example.wecureit_be.impl.DoctorControllerImpl;
 import com.example.wecureit_be.request.AddAppointmentNoteRequest;
 import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
+import com.example.wecureit_be.request.DeleteDoctorAvailabilityRequest;
+import com.example.wecureit_be.request.EditDoctorAvailabilityRequest;
 import com.example.wecureit_be.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,16 @@ public class DoctorController {
     @PostMapping(value = "/availability/add")
     public AddDoctorAvailabilityResponse addAvailability(@RequestBody AddDoctorAvailabilityRequest addDoctorAvailabilityRequest) {
         return doctorControllerImpl.addAvailability(addDoctorAvailabilityRequest);
+    }
+
+    @PostMapping(value = "/availability/edit")
+    public EditDoctorAvailabilityResponse editAvailability(@RequestBody EditDoctorAvailabilityRequest editDoctorAvailabilityRequest) {
+        return doctorControllerImpl.editAvailability(editDoctorAvailabilityRequest);
+    }
+
+    @PostMapping(value = "/availability/delete")
+    public DeleteDoctorAvailabilityResponse editAvailability(@RequestBody DeleteDoctorAvailabilityRequest deleteDoctorAvailabilityRequest) {
+        return doctorControllerImpl.deleteAvailability(deleteDoctorAvailabilityRequest);
     }
 
     @GetMapping(value = "/availability/getSummary")
