@@ -5,6 +5,7 @@ import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.*;
 import com.example.wecureit_be.response.BookAppointmentResponse;
 import com.example.wecureit_be.response.FetchDatesResponse;
+import com.example.wecureit_be.response.PatientAppointments;
 import com.example.wecureit_be.response.PatientBookingL1Response;
 import com.example.wecureit_be.response.TimeSlot;
 import com.example.wecureit_be.utilities.Utils;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -418,6 +420,48 @@ public class PatientControllerImpl {
             }
         }
 
+        return response;
+    }
+
+    // Upcoming appointments for a patient
+    public List<PatientAppointments> getUpcomingAppointments(@RequestParam Integer patientId){
+        List<Appointments> appointmentsList =
+                patientMasterRepository.getUpcomingAppointmentsByPatientId(patientId);
+
+        List<PatientAppointments> response = new ArrayList<>();
+        for(Appointments eachAppointment : appointmentsList){
+            PatientAppointments appointment = new PatientAppointments();
+            appointment.setDoctorName(eachAppointment.getDoctorMaster().getDoctorName());
+            appointment.setSpeciality(eachAppointment.getSpecialityMaster().getSpecialityName());
+            appointment.setAppointmentDate(eachAppointment.getDate());
+            appointment.setStartTime(eachAppointment.getStartTime());
+            appointment.setEndTime(eachAppointment.getEndTime());
+            appointment.setFacilityName(eachAppointment.getDoctorFacilityAvailability().getFacilityMaster().getFacilityName());
+            appointment.setAppointmentNotes(eachAppointment.getAppointmentNotes());
+            appointment.setAppointmentId(eachAppointment.getAppointmentId());
+            response.add(appointment);
+        }
+        return response;
+    }
+
+    // Old Appointments for a patient
+    public List<PatientAppointments> getOldAppointments(@RequestParam Integer patientId){
+        List<Appointments> appointmentsList =
+                patientMasterRepository.getOldAppointmentsByPatientId(patientId);
+
+        List<PatientAppointments> response = new ArrayList<>();
+        for(Appointments eachAppointment : appointmentsList){
+            PatientAppointments appointment = new PatientAppointments();
+            appointment.setDoctorName(eachAppointment.getDoctorMaster().getDoctorName());
+            appointment.setSpeciality(eachAppointment.getSpecialityMaster().getSpecialityName());
+            appointment.setAppointmentDate(eachAppointment.getDate());
+            appointment.setStartTime(eachAppointment.getStartTime());
+            appointment.setEndTime(eachAppointment.getEndTime());
+            appointment.setFacilityName(eachAppointment.getDoctorFacilityAvailability().getFacilityMaster().getFacilityName());
+            appointment.setAppointmentNotes(eachAppointment.getAppointmentNotes());
+            appointment.setAppointmentId(eachAppointment.getAppointmentId());
+            response.add(appointment);
+        }
         return response;
     }
 
