@@ -42,9 +42,8 @@ public class Appointments {
     @JoinColumn(name = "speciality_master_id")
     public SpecialityMaster specialityMaster;
 
-    @ManyToOne
-    @JoinColumn(name = "doctor_master_id")
-    public DoctorMaster doctorMaster;
+    @Column(name = "is_active")
+    public Boolean isActive;
 
 
 }

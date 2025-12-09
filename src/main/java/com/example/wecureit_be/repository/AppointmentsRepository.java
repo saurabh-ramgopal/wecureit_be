@@ -18,6 +18,7 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "left join doctor_facility_availability dfa " +
             "on dfa.df_availability_id = a.df_availability_id " +
             "where dfa.doctor_master_id = :doctorMasterId " +
+            "and a.is_active = true " +
             "order by a.start_time asc ", nativeQuery = true)
     List<Appointments> getAppointmentByDocId (@Param("doctorMasterId") Integer doctorMasterId);
 
@@ -34,6 +35,7 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "ON dfa.df_availability_id = a.df_availability_id " +
             "WHERE dfa.doctor_master_id = :doctorMasterId " +
             "AND (a.date + a.start_time) >= NOW() " +
+            "AND a.is_active = true " +
             "ORDER BY a.start_time ASC ", nativeQuery = true)
     List<Appointments> getAppointmentForNext2Weeks (@Param("doctorMasterId") Integer doctorMasterId);
 
@@ -42,6 +44,7 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "ON dfa.df_availability_id = a.df_availability_id " +
             "WHERE dfa.doctor_master_id = :doctorMasterId " +
             "AND (a.date + a.end_time) <= NOW() " +
+            "AND a.is_active = true " +
             "ORDER BY a.start_time ASC ", nativeQuery = true)
     List<Appointments> getPastAppointments (@Param("doctorMasterId") Integer doctorMasterId);
 
@@ -49,6 +52,7 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "left join doctor_facility_availability dfa " +
             "on dfa.df_availability_id = a.df_availability_id " +
             "where dfa.doctor_master_id = :doctorMasterId " +
+            "AND a.is_active = true " +
             "and a.date > :date ", nativeQuery = true)
     List<Appointments> getAnyFutureAppointmentsByDoctor (@Param("doctorMasterId") Integer doctorMasterId,
                                                          @Param("date")LocalDate date);
@@ -57,13 +61,23 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "left join doctor_facility_availability dfa " +
             "on dfa.df_availability_id = a.df_availability_id " +
             "where dfa.facility_master_id = :facilityMasterId " +
+            "AND a.is_active = true " +
             "and a.date > :date ", nativeQuery = true)
     List<Appointments> getAnyFutureAppointmentsByFacility (@Param("facilityMasterId") String facilityMasterId,
                                                            @Param("date")LocalDate date);
 
     @Query(value = "select * from appointments a " +
-            "where a.df_availability_id = :dfAvailabilityId ", nativeQuery = true)
+            "where a.df_availability_id = :dfAvailabilityId " +
+            "AND a.is_active = true ", nativeQuery = true)
     List<Appointments> getAppointmentsByDfAvailabilityId (@Param("dfAvailabilityId") String dfAvailabilityId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE appointments " +
+            "SET is_active = :isActive " +
+            "where appointment_id = :appointmentId", nativeQuery = true)
+    void deleteAppointmentId(@Param("appointmentId") Integer appointmentId,
+                             @Param("isActive") Boolean isActive);
 
 
 }
