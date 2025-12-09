@@ -246,6 +246,12 @@ public class DoctorControllerImpl {
         return true;
     }
 
+    public DeleteAppointmentResponse deleteAppointment(DeleteAppointmentRequest deleteAppointmentRequest) {
+        appointmentsRepository.deleteAppointmentId
+                (deleteAppointmentRequest.getAppointmentId(), deleteAppointmentRequest.getIsActive());
+        return new DeleteAppointmentResponse(deleteAppointmentRequest.getAppointmentId(), deleteAppointmentRequest.getIsActive());
+    }
+
     public List<BookAppointmentResponse> getFutureAppointments (Integer doctorId) {
 
         List<BookAppointmentResponse> response = new ArrayList<>();

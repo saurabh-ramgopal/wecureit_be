@@ -1,10 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.impl.DoctorControllerImpl;
-import com.example.wecureit_be.request.AddAppointmentNoteRequest;
-import com.example.wecureit_be.request.AddDoctorAvailabilityRequest;
-import com.example.wecureit_be.request.DeleteDoctorAvailabilityRequest;
-import com.example.wecureit_be.request.EditDoctorAvailabilityRequest;
+import com.example.wecureit_be.request.*;
 import com.example.wecureit_be.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +58,11 @@ public class DoctorController {
     @GetMapping(value="appointments/getAllPast")
     public List<BookAppointmentResponse> getPastAppointments(@RequestParam Integer doctorId) {
         return doctorControllerImpl.getPastAppointments(doctorId);
+    }
+
+    @PostMapping(value="appointments/delete")
+    public DeleteAppointmentResponse deleteAppointment (@RequestBody DeleteAppointmentRequest deleteAppointmentRequest) {
+        return doctorControllerImpl.deleteAppointment(deleteAppointmentRequest);
     }
 
 }

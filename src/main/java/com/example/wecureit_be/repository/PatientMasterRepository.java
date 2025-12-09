@@ -21,6 +21,7 @@ public interface PatientMasterRepository extends JpaRepository<PatientMaster, In
     SELECT *
     FROM appointments
     WHERE patient_master_id = :patientId
+    AND is_active = true
     AND (
             date > CURRENT_DATE
             OR (date = CURRENT_DATE AND end_time > CURRENT_TIME)
@@ -34,6 +35,7 @@ public interface PatientMasterRepository extends JpaRepository<PatientMaster, In
     SELECT *
     FROM appointments
     WHERE patient_master_id = :patientId
+    AND is_active = true
     AND (
             date < CURRENT_DATE
             OR (date = CURRENT_DATE AND end_time < CURRENT_TIME)
