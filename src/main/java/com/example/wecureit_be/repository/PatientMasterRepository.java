@@ -44,6 +44,9 @@ public interface PatientMasterRepository extends JpaRepository<PatientMaster, In
     """, nativeQuery = true)
     List<Appointments> getOldAppointmentsByPatientId(@Param("patientId") Integer patientId);
 
+    @Query(value = "SELECT * FROM appointments WHERE patient_master_id = :patientId and is_active = false ", nativeQuery = true)
+    List<Appointments> getCancelledAppointmentsByPatientId(@Param("patientId") Integer patientId);
+
 
 
 }
