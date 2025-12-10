@@ -83,4 +83,9 @@ public class PatientController {
         return patientControllerImpl.getOldAppointments(patientId);
     }
 
+    @GetMapping(value="/cancelledAppointments")
+    public List<PatientAppointments> getAllCancelledAppointments(@RequestParam Integer patientId) {
+        return patientControllerImpl.getAllCancelledAppointments(patientId);
+    }
+
 }

@@ -497,4 +497,23 @@ public class PatientControllerImpl {
         return response;
     }
 
+    public List<PatientAppointments> getAllCancelledAppointments(Integer patientId) {
+        List<Appointments> appointmentsList =
+                patientMasterRepository.getCancelledAppointmentsByPatientId(patientId);
+
+        List<PatientAppointments> response = new ArrayList<>();
+        for(Appointments eachAppointment : appointmentsList){
+            PatientAppointments appointment = new PatientAppointments();
+            appointment.setDoctorName(eachAppointment.getDoctorFacilityAvailability().getDoctorMaster().getDoctorName());
+            appointment.setSpeciality(eachAppointment.getSpecialityMaster().getSpecialityName());
+            appointment.setAppointmentDate(eachAppointment.getDate());
+            appointment.setStartTime(eachAppointment.getStartTime());
+            appointment.setEndTime(eachAppointment.getEndTime());
+            appointment.setFacilityName(eachAppointment.getDoctorFacilityAvailability().getFacilityMaster().getFacilityName());
+            appointment.setAppointmentNotes(eachAppointment.getAppointmentNotes());
+            appointment.setAppointmentId(eachAppointment.getAppointmentId());
+            response.add(appointment);
+        }
+        return response;
+    }
 }
