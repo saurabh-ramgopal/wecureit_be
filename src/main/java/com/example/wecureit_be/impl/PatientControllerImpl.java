@@ -433,6 +433,7 @@ public class PatientControllerImpl {
         appointments.setStartTime(bookAppointmentRequest.getStartTime());
         appointments.setEndTime(bookAppointmentRequest.getEndTime());
         appointments.setSpecialityMaster(specialityMaster);
+        appointments.setIsActive(true);
         appointmentsRepository.save(appointments);
         BeanUtils.copyProperties(appointments, response);
 

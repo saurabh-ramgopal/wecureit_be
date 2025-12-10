@@ -35,6 +35,7 @@ public interface FacilityMasterRepository extends JpaRepository<FacilityMaster, 
             JOIN doctor_state_specs dss
                 ON dss.state_code = fm.state_code
                 AND dss.speciality_master_id = fsm.speciality_master_id
+                AND fm.is_active = true
             """,
         nativeQuery = true
     )
