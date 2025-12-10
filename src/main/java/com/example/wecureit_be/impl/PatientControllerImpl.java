@@ -311,7 +311,8 @@ public class PatientControllerImpl {
                 doctorFacilityAvailabilityRepository.getByDfAvailabilityId(getSlotsRequest.getDfAvailabilityId());
 
         List<Appointments> docAppointments =
-                appointmentsRepository.getAppointmentByDocId(doctorFacilityAvailability.getDoctorMaster().getDoctorMasterId());
+                appointmentsRepository.getAppointmentByDocId(doctorFacilityAvailability.getDoctorMaster().getDoctorMasterId(),
+                        doctorFacilityAvailability.getDfAvailabilityId());
 
         LocalTime currStartTime = doctorFacilityAvailability.getAvailableStartTime();
         int durationReq = getSlotsRequest.getDuration();
@@ -386,33 +387,32 @@ public class PatientControllerImpl {
 
     private boolean checkFourHourWindow(LocalTime proposedStart, LocalTime proposedEnd, List<Appointments> appointments) {
 
+        // No appointments → no restriction
         if (appointments == null || appointments.isEmpty()) {
             return true;
         }
 
-        LocalTime earliestStart = null;
-        LocalTime latestEnd = null;
+        // Exactly one appointment → enforce ±4 hour window around that appointment
+        if (appointments.size() == 1) {
+            Appointments appt = appointments.get(0);
+            LocalTime allowedStart = appt.getEndTime().minusHours(4);   // earliest allowed start
+            LocalTime allowedEnd = appt.getStartTime().plusHours(4);   // latest allowed end
 
-        for (Appointments appointment : appointments) {
-            LocalTime startTime = appointment.getStartTime();
-            if (earliestStart == null || startTime.isBefore(earliestStart)) {
-                earliestStart = startTime;
-            }
+            // Respect availability boundaries elsewhere; here we only check ±4h rule
+            return !proposedStart.isBefore(allowedStart) && !proposedEnd.isAfter(allowedEnd);
         }
 
-        for (Appointments appointment : appointments) {
-            LocalTime endTime = appointment.getEndTime();
-            if (latestEnd == null || endTime.isAfter(latestEnd)) {
-                latestEnd = endTime;
-            }
+        // Two or more appointments → ensure total span (earliest start -> latest end) ≤ 8 hours
+        LocalTime minStart = proposedStart;
+        LocalTime maxEnd = proposedEnd;
+
+        for (Appointments appt : appointments) {
+            if (appt.getStartTime().isBefore(minStart)) minStart = appt.getStartTime();
+            if (appt.getEndTime().isAfter(maxEnd)) maxEnd = appt.getEndTime();
         }
 
-        LocalTime allowedStart = latestEnd.minusHours(4);
-        LocalTime allowedEnd = earliestStart.plusHours(4);
-
-        boolean isAllowed = !proposedStart.isBefore(allowedStart) && !proposedEnd.isAfter(allowedEnd);
-
-        return isAllowed;
+        long totalSpanMinutes = java.time.Duration.between(minStart, maxEnd).toMinutes();
+        return totalSpanMinutes <= 8 * 60; // <= 8 hours
     }
 
     public BookAppointmentResponse bookAppointment(BookAppointmentRequest bookAppointmentRequest) {

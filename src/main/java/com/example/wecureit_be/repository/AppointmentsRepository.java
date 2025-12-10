@@ -18,9 +18,11 @@ public interface AppointmentsRepository extends JpaRepository<Appointments, Inte
             "left join doctor_facility_availability dfa " +
             "on dfa.df_availability_id = a.df_availability_id " +
             "where dfa.doctor_master_id = :doctorMasterId " +
+            "and a.df_availability_id = :dfAvailabilityId "+
             "and a.is_active = true " +
             "order by a.start_time asc ", nativeQuery = true)
-    List<Appointments> getAppointmentByDocId (@Param("doctorMasterId") Integer doctorMasterId);
+    List<Appointments> getAppointmentByDocId (@Param("doctorMasterId") Integer doctorMasterId,
+                                              @Param("dfAvailabilityId") String dfAvailabilityId);
 
     @Transactional
     @Modifying
