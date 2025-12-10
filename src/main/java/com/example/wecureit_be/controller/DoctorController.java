@@ -1,6 +1,7 @@
 package com.example.wecureit_be.controller;
 
 import com.example.wecureit_be.impl.DoctorControllerImpl;
+import com.example.wecureit_be.impl.PatientControllerImpl;
 import com.example.wecureit_be.request.*;
 import com.example.wecureit_be.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class DoctorController {
 
     @Autowired
     DoctorControllerImpl doctorControllerImpl;
+
+    @Autowired
+    PatientControllerImpl patientControllerImpl;
 
     @GetMapping(value="/getById")
     public DoctorDetails getById(@RequestParam Integer doctorId) {
@@ -63,6 +67,11 @@ public class DoctorController {
     @PostMapping(value="appointments/delete")
     public DeleteAppointmentResponse deleteAppointment (@RequestBody DeleteAppointmentRequest deleteAppointmentRequest) {
         return doctorControllerImpl.deleteAppointment(deleteAppointmentRequest);
+    }
+
+    @GetMapping(value="/patientHistory")
+    public PatientHistoryResponse getPatientHistory(@RequestParam Integer patientId) {
+        return patientControllerImpl.getPatientHistory(patientId);
     }
 
 }

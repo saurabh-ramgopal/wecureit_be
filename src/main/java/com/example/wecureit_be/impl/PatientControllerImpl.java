@@ -3,11 +3,7 @@ package com.example.wecureit_be.impl;
 import com.example.wecureit_be.entity.*;
 import com.example.wecureit_be.repository.*;
 import com.example.wecureit_be.request.*;
-import com.example.wecureit_be.response.BookAppointmentResponse;
-import com.example.wecureit_be.response.FetchDatesResponse;
-import com.example.wecureit_be.response.PatientAppointments;
-import com.example.wecureit_be.response.PatientBookingL1Response;
-import com.example.wecureit_be.response.TimeSlot;
+import com.example.wecureit_be.response.*;
 import com.example.wecureit_be.utilities.Utils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Period;
 import java.util.*;
 
 @Slf4j
@@ -515,5 +513,30 @@ public class PatientControllerImpl {
             response.add(appointment);
         }
         return response;
+    }
+
+    public PatientHistoryResponse getPatientHistory(Integer patientId) {
+
+        PatientMaster patientMaster = patientMasterRepository.getPatientById(patientId);
+
+        List<Appointments> appointmentsList =
+                patientMasterRepository.getOldAppointmentsByPatientId(patientId);
+
+        List<PatientHistoryResponseList> historyList = new ArrayList<>();
+        for(Appointments eachAppointment : appointmentsList){
+            PatientHistoryResponseList appointmentHistory = new PatientHistoryResponseList();
+            appointmentHistory.setSpecialityName(eachAppointment.getSpecialityMaster().getSpecialityName());
+            appointmentHistory.setAppointmentDate(eachAppointment.getDate());
+            appointmentHistory.setFacilityName(eachAppointment.getDoctorFacilityAvailability().getFacilityMaster().getFacilityName());
+            appointmentHistory.setAppointmentNote(eachAppointment.getAppointmentNotes());
+            appointmentHistory.setDoctorName(eachAppointment.getDoctorFacilityAvailability().getDoctorMaster().getDoctorName());
+            historyList.add(appointmentHistory);
+        }
+
+        Period period = Period.between(patientMaster.getPatientDob(), LocalDate.now());
+        String age = period.getYears() + " years, " + period.getMonths() + " months";
+
+        return new PatientHistoryResponse (patientMaster.getPatientName(), age,
+                patientMaster.getPatientGender(), historyList);
     }
 }
