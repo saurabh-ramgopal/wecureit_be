@@ -287,10 +287,10 @@ public class DoctorControllerImpl {
                 doctorFacilityAvailabilityRepository.getFutureAvailabilityByDocId(doctorId);
 
         List<AddDoctorAvailabilityList> resFacilityList = new ArrayList<>();
-        List<SpecialityMaster> specialityMasterList = new ArrayList<>();
+        List<SpecialityMaster> specialityMasterList;
 
         for(DoctorFacilityAvailability eachAvailability : list){
-
+            specialityMasterList = new ArrayList<>();
             List<PractisingSpeciality> practisingSpeciality =
                     practisingSpecialityRepository.getSpecialitiesByDfaId(eachAvailability.getDfAvailabilityId());
 
