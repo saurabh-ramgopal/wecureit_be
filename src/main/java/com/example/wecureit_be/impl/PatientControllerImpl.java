@@ -40,7 +40,11 @@ public class PatientControllerImpl {
     @Autowired
     SpecialityMasterRepository specialityMasterRepository;
 
+    @Autowired
+    DoctorSpecialityMappingRepository doctorSpecialityMappingRepository;
+
     private static final int defaultSlotDuration = 15;
+    private static final String GeneralPractice = "GEN";
 
 
     public PatientMaster addOrUpdate(PatientMaster patientMaster) {
@@ -147,7 +151,16 @@ public class PatientControllerImpl {
                     if(!specialityMasterList.contains(eachSpeciality.getSpecialityMaster())){
                         specialityMasterList.add(eachSpeciality.getSpecialityMaster());
                     }
+                }
+            }
 
+            SpecialityMaster generalPractice = specialityMasterRepository.getSpecialityById(GeneralPractice);
+            List<DoctorSpecialityMapping> docSpecs = doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(patientBookingRequest.getDoctorMasterId());
+
+            for(DoctorSpecialityMapping eachMap : docSpecs){
+                if(eachMap.getSpecialityMaster().equals(generalPractice)){
+                    specialityMasterList.add(generalPractice);
+                    break;
                 }
             }
 
@@ -166,6 +179,35 @@ public class PatientControllerImpl {
 
             List<PractisingSpeciality> allPractisingSpecialities =
                     practisingSpecialityRepository.getDfaIdBySpecialty(patientBookingRequest.getSpecialityMasterId());
+
+            if(patientBookingRequest.getSpecialityMasterId().equals(GeneralPractice)){
+                allPractisingSpecialities = practisingSpecialityRepository.getAllDfaId();
+
+                for(PractisingSpeciality each: allPractisingSpecialities){
+                    if(!facilityMasterList.contains(each.getDoctorFacilityAvailability().getFacilityMaster())){
+                        facilityMasterList.add(each.getDoctorFacilityAvailability().getFacilityMaster());
+                    }
+
+                    if(!doctorMasterList.contains(each.getDoctorFacilityAvailability().getDoctorMaster())){
+                        doctorMasterList.add(each.getDoctorFacilityAvailability().getDoctorMaster());
+                    }
+
+                }
+
+                List<DoctorMaster> newDoctorMasterList = new ArrayList<>();
+                for(DoctorMaster everyDoc : doctorMasterList){
+                    List<DoctorSpecialityMapping> docSpecs =
+                            doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(everyDoc.getDoctorMasterId());
+                    SpecialityMaster generalPractice = specialityMasterRepository.getSpecialityById(GeneralPractice);
+                    for(DoctorSpecialityMapping spec: docSpecs){
+                        if(spec.getSpecialityMaster().equals(generalPractice)){
+                            newDoctorMasterList.add(everyDoc);
+                        }
+                    }
+                }
+
+                return new PatientBookingL1Response(facilityMasterList, null, newDoctorMasterList);
+            }
 
             for(PractisingSpeciality each: allPractisingSpecialities){
                 if(!doctorMasterList.contains(each.getDoctorFacilityAvailability().getDoctorMaster())){
@@ -209,6 +251,8 @@ public class PatientControllerImpl {
                 }
             }
 
+            specialityMasterList.add(specialityMasterRepository.getSpecialityById(GeneralPractice));
+
             //res (doctor + speciality)
             return new PatientBookingL1Response(null, specialityMasterList, doctorMasterList);
         }
@@ -230,6 +274,23 @@ public class PatientControllerImpl {
 
             List<SpecialityMaster> specialityMasterList = new ArrayList<>();
 
+            boolean isNeeded = false;
+            if(!availableBookings.isEmpty()){
+                DoctorMaster doctorMaster = availableBookings.getFirst().getDoctorMaster();
+                FacilityMaster facilityMaster = availableBookings.getFirst().getFacilityMaster();
+
+                SpecialityMaster generalPractice = specialityMasterRepository.getSpecialityById(GeneralPractice);
+                List<DoctorSpecialityMapping> docSpecs = doctorSpecialityMappingRepository.getDoctorSpecialityByDoctorId(doctorMaster.getDoctorMasterId());
+
+                for(DoctorSpecialityMapping eachMap : docSpecs){
+                    if(eachMap.getSpecialityMaster().equals(generalPractice)
+                            && eachMap.getStateMaster().equals(facilityMaster.getStateCode())){
+                        isNeeded = true;
+                        break;
+                    }
+                }
+            }
+
             for(DoctorFacilityAvailability eachAvailability: availableBookings){
                 List<PractisingSpeciality> practisingSpecialityList =
                         practisingSpecialityRepository.getSpecialitiesByDfaId(eachAvailability.getDfAvailabilityId());
@@ -241,6 +302,10 @@ public class PatientControllerImpl {
                 }
             }
 
+            if(isNeeded){
+                specialityMasterList.add(specialityMasterRepository.getSpecialityById(GeneralPractice));
+            }
+
             return new PatientBookingL1Response(null, specialityMasterList, null);
         }
 
@@ -249,9 +314,16 @@ public class PatientControllerImpl {
                 !ObjectUtils.isEmpty(patientBookingRequest.getSpecialityMasterId()) &&
                     ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId())){
 
-            List<DoctorFacilityAvailability> availableBookings =
-                    doctorFacilityAvailabilityRepository.getAvailabilityByFacIdAndSpecId
-                            (patientBookingRequest.getFacilityMasterId(), patientBookingRequest.getSpecialityMasterId());
+            List<DoctorFacilityAvailability> availableBookings;
+
+            if(patientBookingRequest.getSpecialityMasterId().equals(GeneralPractice)){
+                availableBookings = doctorFacilityAvailabilityRepository.getAllDfAvailabilitiesForFacAdGen(patientBookingRequest.getFacilityMasterId());
+            }
+            else{
+                availableBookings =
+                        doctorFacilityAvailabilityRepository.getAvailabilityByFacIdAndSpecId
+                                (patientBookingRequest.getFacilityMasterId(), patientBookingRequest.getSpecialityMasterId());
+            }
 
             List<DoctorMaster> doctorMasterList = new ArrayList<>();
 
@@ -269,9 +341,16 @@ public class PatientControllerImpl {
                 !ObjectUtils.isEmpty(patientBookingRequest.getDoctorMasterId()) &&
                     ObjectUtils.isEmpty(patientBookingRequest.getFacilityMasterId())){
 
-            List<DoctorFacilityAvailability> availableBookings =
-                    doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecId
-                            (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId());
+            List<DoctorFacilityAvailability> availableBookings;
+
+            if(patientBookingRequest.getSpecialityMasterId().equals(GeneralPractice)){
+                availableBookings = doctorFacilityAvailabilityRepository.getAllDfAvailabilitiesForDocAdGen(patientBookingRequest.getDoctorMasterId());
+            }
+            else{
+                availableBookings =
+                        doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecId
+                                (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId());
+            }
 
             List<FacilityMaster> facilityMasterList = new ArrayList<>();
 
@@ -289,10 +368,17 @@ public class PatientControllerImpl {
 
     public List<FetchDatesResponse> appointmentDates (PatientBookingRequest patientBookingRequest) {
 
-        List<DoctorFacilityAvailability> availableFacDocs =
-                doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecIdAndFacId
-                        (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId(),
-                                patientBookingRequest.getFacilityMasterId());
+        List<DoctorFacilityAvailability> availableFacDocs ;
+        if(patientBookingRequest.getSpecialityMasterId().equals(GeneralPractice)){
+            availableFacDocs = doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndGenAndFacId(
+                    patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getFacilityMasterId());
+        }
+        else{
+            availableFacDocs =
+                    doctorFacilityAvailabilityRepository.getAvailabilityByDocIdAndSpecIdAndFacId
+                            (patientBookingRequest.getDoctorMasterId(), patientBookingRequest.getSpecialityMasterId(),
+                                    patientBookingRequest.getFacilityMasterId());
+        }
 
         List<FetchDatesResponse> response = new ArrayList<>();
 
@@ -385,22 +471,18 @@ public class PatientControllerImpl {
 
     private boolean checkFourHourWindow(LocalTime proposedStart, LocalTime proposedEnd, List<Appointments> appointments) {
 
-        // No appointments → no restriction
         if (appointments == null || appointments.isEmpty()) {
             return true;
         }
 
-        // Exactly one appointment → enforce ±4 hour window around that appointment
         if (appointments.size() == 1) {
             Appointments appt = appointments.get(0);
-            LocalTime allowedStart = appt.getEndTime().minusHours(4);   // earliest allowed start
-            LocalTime allowedEnd = appt.getStartTime().plusHours(4);   // latest allowed end
+            LocalTime allowedStart = appt.getEndTime().minusHours(4);
+            LocalTime allowedEnd = appt.getStartTime().plusHours(4);
 
-            // Respect availability boundaries elsewhere; here we only check ±4h rule
             return !proposedStart.isBefore(allowedStart) && !proposedEnd.isAfter(allowedEnd);
         }
 
-        // Two or more appointments → ensure total span (earliest start -> latest end) ≤ 8 hours
         LocalTime minStart = proposedStart;
         LocalTime maxEnd = proposedEnd;
 
@@ -410,7 +492,7 @@ public class PatientControllerImpl {
         }
 
         long totalSpanMinutes = java.time.Duration.between(minStart, maxEnd).toMinutes();
-        return totalSpanMinutes <= 8 * 60; // <= 8 hours
+        return totalSpanMinutes <= 8 * 60;
     }
 
     public BookAppointmentResponse bookAppointment(BookAppointmentRequest bookAppointmentRequest) {
