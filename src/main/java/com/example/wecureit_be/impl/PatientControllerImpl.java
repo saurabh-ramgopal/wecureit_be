@@ -492,7 +492,7 @@ public class PatientControllerImpl {
         }
 
         long totalSpanMinutes = java.time.Duration.between(minStart, maxEnd).toMinutes();
-        return totalSpanMinutes <= 8 * 60;
+        return totalSpanMinutes <= 16 * 60;
     }
 
     public BookAppointmentResponse bookAppointment(BookAppointmentRequest bookAppointmentRequest) {
