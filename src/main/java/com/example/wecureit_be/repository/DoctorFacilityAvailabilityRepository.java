@@ -49,6 +49,13 @@ public interface DoctorFacilityAvailabilityRepository extends JpaRepository<Doct
              @Param("specialityMasterId") String specialityMasterId,
              @Param("facilityMasterId") String facilityMasterId);
 
+    @Query(value = "select dfa.* from doctor_facility_availability dfa " +
+            "where dfa.doctor_master_id = :doctorMasterId " +
+            "and dfa.facility_master_id = :facilityMasterId and dfa.is_active = true ", nativeQuery = true)
+    List<DoctorFacilityAvailability> getAvailabilityByDocIdAndGenAndFacId
+            (@Param("doctorMasterId") Integer doctorMasterId,
+             @Param("facilityMasterId") String facilityMasterId);
+
     @Query(value = "select * from doctor_facility_availability dfa " +
             "where dfa.doctor_master_id = :doctorMasterId " +
             "and dfa.available_date >= CURRENT_DATE " +
@@ -59,5 +66,23 @@ public interface DoctorFacilityAvailabilityRepository extends JpaRepository<Doct
     @Query(value = "SELECT * FROM doctor_facility_availability WHERE doctor_master_id = :doctorId and available_date = :date ", nativeQuery = true)
     List<DoctorFacilityAvailability> getAllDfAvailabilitiesForDay(@Param("doctorId") Integer doctorId,
                                                                   @Param("date") LocalDate date);
+
+    @Query(value = "select dfa.* from doctor_facility_availability dfa " +
+            "left join doctor_speciality_mapping dsm on dsm.doctor_master_id  = dfa.doctor_master_id " +
+            "left join facility_master fm on fm.facility_master_id = dfa.facility_master_id " +
+            "where dfa.doctor_master_id = :doctorId " +
+            "and dsm.speciality_master_id = 'GEN' " +
+            "and fm.state_code = dsm.state_code " +
+            "and dfa.is_active = true ", nativeQuery = true)
+    List<DoctorFacilityAvailability> getAllDfAvailabilitiesForDocAdGen(@Param("doctorId") Integer doctorId);
+
+    @Query(value = "select dfa.* from doctor_facility_availability dfa " +
+            "left join doctor_speciality_mapping dsm on dsm.doctor_master_id  = dfa.doctor_master_id " +
+            "left join facility_master fm on fm.facility_master_id = dfa.facility_master_id " +
+            "where dfa.facility_master_id = :facilityMasterId " +
+            "and dsm.speciality_master_id = 'GEN' " +
+            "and fm.state_code = dsm.state_code " +
+            "and dfa.is_active = true ", nativeQuery = true)
+    List<DoctorFacilityAvailability> getAllDfAvailabilitiesForFacAdGen(@Param("facilityMasterId") String facilityMasterId);
 
 }

@@ -28,4 +28,7 @@ public interface PractisingSpecialityRepository extends JpaRepository<Practising
     @Query(value = "SELECT * FROM practising_speciality WHERE speciality_master_id = :specialityMasterId", nativeQuery = true)
     List<PractisingSpeciality> getDfaIdBySpecialty(@Param("specialityMasterId") String specialityMasterId);
 
+    @Query(value = "SELECT * FROM practising_speciality ", nativeQuery = true)
+    List<PractisingSpeciality> getAllDfaId ();
+
 }
